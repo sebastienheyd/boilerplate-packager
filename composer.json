@@ -1,0 +1,42 @@
+{
+    "name": "sebastienheyd/boilerplate-packager",
+    "description": "Generate package for sebastienheyd/boilerplate",
+    "license": "license",
+    "authors": [
+        {
+            "name": "Sébastien Heyd",
+            "email": "contact@sheyd.fr"
+        }
+    ],
+    "homepage": "https://github.com/sebastienheyd/boilerplate-packager",
+    "keywords": ["Laravel", "Boilerplate', 'Packager"],
+    "require": {
+        "ext-curl": "*",
+        "ext-json": "*",
+        "illuminate/support": "~5|~6|~7",
+        "guzzlehttp/guzzle": "~7"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.0",
+        "mockery/mockery": "^1.1",
+        "orchestra/testbench": "~3|~4",
+        "sempro/phpunit-pretty-print": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sebastienheyd\\BoilerplatePackager\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Sebastienheyd\\BoilerplatePackager\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Sebastienheyd\\BoilerplatePackager\\ServiceProvider"
+            ]
+        }
+    }
+}
