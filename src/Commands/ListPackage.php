@@ -72,17 +72,18 @@ class ListPackage extends Command
         foreach (array_diff(scandir($path), ['.', '..']) as $vendor) {
             foreach (array_diff(scandir("$path/$vendor"), ['.', '..']) as $name) {
 
-                if($vendor === '.temp') {
+                if ($vendor === '.temp') {
                     $this->fileHandler->removeDir($this->fileHandler->tempDir());
                     continue;
                 }
 
                 $list["$vendor/$name"] = [
-                    'vendor'     => $vendor,
-                    'name'       => $name,
-                    'installed'  => 'no',
-                    'remote_url' => '-',
-                    'branch'     => '-',
+                    'vendor'      => $vendor,
+                    'name'        => $name,
+                    'installed'   => 'no',
+                    'remote_url'  => '-',
+                    'branch'      => '-',
+                    'require-dev' => '-',
                 ];
 
                 (new Process(['git', 'branch'], "$path/$vendor/$name"))
@@ -102,9 +103,13 @@ class ListPackage extends Command
                         $list["$vendor/$name"]['installed'] = 'yes';
                     }
                 }
+
+                if (isset($this->composer->{"require-dev"}->{"$vendor/$name"})) {
+                    $list["$vendor/$name"]['require-dev'] = 'yes';
+                }
             }
         }
 
-        $this->table(['Vendor', 'Name', 'Used', 'Remote URL', 'Branch'], $list);
+        $this->table(['Vendor', 'Name', 'Used', 'Remote URL', 'Branch', 'Require-dev'], $list);
     }
 }

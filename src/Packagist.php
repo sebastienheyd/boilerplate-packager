@@ -10,12 +10,12 @@ class Packagist
 {
     public function checkFormat($name)
     {
-        return preg_match('`^([A-Za-z0-9\-]*)/([A-Za-z0-9\-]*)$`', $name);
+        return preg_match('`^([a-z0-9\-]*)/([a-z0-9\-]*)$`', $name);
     }
 
     public function getPackageInformation($name)
     {
-        if (!$this->existsOnPackagist($name)) {
+        if (!$this->exists($name)) {
             throw new RuntimeException('Package does not exists on packagist');
         }
 
@@ -31,7 +31,7 @@ class Packagist
         }
     }
 
-    public function existsOnPackagist($name)
+    public function exists($name)
     {
         if (!$this->checkFormat($name)) {
             throw new RuntimeException('Package format is invalid');
