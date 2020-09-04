@@ -8,7 +8,7 @@ use Sebastienheyd\BoilerplatePackager\FileHandler;
 use Sebastienheyd\BoilerplatePackager\Package;
 use Sebastienheyd\BoilerplatePackager\Packagist;
 
-class GetPackage extends Command
+class InstallPackage extends Command
 {
 
     /**
@@ -16,7 +16,7 @@ class GetPackage extends Command
      *
      * @var string
      */
-    protected $signature = 'boilerplate:packager:get {package} {--dev}';
+    protected $signature = 'boilerplate:packager:install {package} {--dev}';
 
     /**
      * The console command description.
@@ -71,7 +71,7 @@ class GetPackage extends Command
         // If is format vendor/name get information from packagist
         if ($this->packagist->checkFormat($url)) {
             $this->info('Getting package information from packagist.org...');
-            if (!$this->packagist->existsOnPackagist($url)) {
+            if (!$this->packagist->exists($url)) {
                 $this->error('Package does not exists on packagist.org');
                 exit;
             }
@@ -83,7 +83,7 @@ class GetPackage extends Command
 
         // Get information from the given repository URL
         if (!($package = $this->package->parseFromUrl($url))) {
-            $this->error('Package URL is invalid');
+            $this->error('Package name or repository URL is invalid');
             exit;
         }
 
