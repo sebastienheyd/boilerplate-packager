@@ -70,6 +70,11 @@ class ListPackage extends Command
         $list = [];
 
         foreach (array_diff(scandir($path), ['.', '..']) as $vendor) {
+
+            if(!is_dir("$path/$vendor")) {
+                continue;
+            }
+
             foreach (array_diff(scandir("$path/$vendor"), ['.', '..']) as $name) {
 
                 if($vendor === '.temp') {
