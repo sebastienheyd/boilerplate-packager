@@ -89,17 +89,21 @@ class NewPackage extends Command
             'author_email'        => $this->forceAnswer('Author email'),
             'package_description' => $this->forceAnswer('Package description'),
             'license'             => $this->forceAnswer('License', 'MIT'),
-            'sc:vendor'           => Str::studly($vendor),
-            'sc:package'          => Str::studly($package),
+            'uc:vendor'           => Str::studly($vendor),
+            'uc:package'          => Str::studly($package),
+            'sc:vendor'           => Str::slug($vendor, '_'),
+            'sc:package'          => Str::slug($package, '_'),
             'vendor'              => $vendor,
             'package'             => $package,
+            'date'                => date('Y_m_d_His'),
+            'locale'              => config('boilerplate.app.locale'),
         ]);
 
         $this->info('Download package skeleton...');
         $this->skeleton->download();
 
         $this->info('Building package...');
-        $this->skeleton->parse();
+        $this->skeleton->build();
 
         //$this->fileHandler->removeDir($this->fileHandler->tempDir());
 
