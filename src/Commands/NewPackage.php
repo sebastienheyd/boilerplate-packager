@@ -67,22 +67,28 @@ class NewPackage extends Command
     public function handle()
     {
         $package = Str::lower($this->argument('package'));
+        $this->alert("Creating a new package $package");
 
         if (!$this->packagist->checkFormat($package)) {
             $this->error('Package name format must be vendor/package');
             exit;
         }
 
+        $this->getOutput()->write('<fg=green>Checking if package already exists on packagist... </>');
         if ($this->packagist->exists($package)) {
+            $this->getOutput()->write(PHP_EOL);
             if ($this->confirm('Package already exists on packagist, do you want to install it?')) {
                 $this->getApplication()->addCommands([$this->resolveCommand(__NAMESPACE__.'\\InstallPackage')]);
                 $this->call('boilerplate:packager:install', ['package' => $package]);
             }
             exit;
+        } else {
+            $this->getOutput()->write('<fg=green>ok</>');
         }
 
+        $this->getOutput()->write(PHP_EOL);
+
         [$vendor, $package] = explode('/', $package);
-        $this->alert("Creating a new package $vendor/$package");
 
         $this->skeleton->assign([
             'author_name'         => $this->forceAnswer('Author name'),
@@ -93,10 +99,21 @@ class NewPackage extends Command
             'uc:package'          => Str::studly($package),
             'sc:vendor'           => Str::slug($vendor, '_'),
             'sc:package'          => Str::slug($package, '_'),
+            'wd:package'          => mb_convert_case(Str::slug($package, ' '), MB_CASE_TITLE),
+            'wd:package'          => mb_convert_case(Str::slug($package, ' '), MB_CASE_TITLE),
             'vendor'              => $vendor,
             'package'             => $package,
             'date'                => date('Y_m_d_His'),
             'locale'              => config('boilerplate.app.locale'),
+        ]);
+
+        $resource = Str::singular($this->forceAnswer('Resource name'));
+        $this->skeleton->assign([
+            'uc:pl:resource' => Str::plural(mb_convert_case(Str::slug($resource, ' '), MB_CASE_TITLE)),
+            'pl:resource' => Str::plural(Str::slug($resource, ' '), MB_CASE_TITLE),
+            'wd:resource' => mb_convert_case(Str::slug($resource, ' '), MB_CASE_TITLE),
+            'uc:resource' => Str::studly($resource),
+            'resource'    => strtolower($resource),
         ]);
 
         $this->info('Download package skeleton...');
