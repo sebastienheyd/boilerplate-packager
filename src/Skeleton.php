@@ -2,6 +2,8 @@
 
 namespace Sebastienheyd\BoilerplatePackager;
 
+use Illuminate\Support\Str;
+
 class Skeleton
 {
     public $assign = [];
@@ -38,6 +40,17 @@ class Skeleton
 
     public function build()
     {
+        $modifiers = [];
+        foreach ($this->assign as $k => $v) {
+            $modifiers[':uc:pl'.$k] = Str::plural(mb_convert_case(Str::slug($v, ' '), MB_CASE_TITLE));
+            $modifiers[':uc'.$k] = Str::studly($v);
+            $modifiers[':sc'.$k] = Str::slug($v, '_');
+            $modifiers[':wd'.$k] = mb_convert_case(Str::slug($v, ' '), MB_CASE_TITLE);
+            $modifiers[':pl'.$k] = Str::plural(Str::slug($v, ' '), MB_CASE_TITLE);
+        }
+
+        $replacements = array_merge($modifiers, $this->assign);
+
         $iterator = (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->fileHandler->tempDir())));
         foreach ($iterator as $item) {
             /** @var \SplFileInfo $item */
@@ -46,7 +59,7 @@ class Skeleton
             }
 
             $content = file_get_contents($item->getPathname());
-            $content = str_replace(array_keys($this->assign), array_values($this->assign), $content);
+            $content = str_replace(array_keys($replacements), array_values($replacements), $content);
             file_put_contents($item->getPathname(), $content);
         }
 
@@ -56,11 +69,11 @@ class Skeleton
 
     private function moveFiles()
     {
-        if (!is_file($this->fileHandler->tempDir('package.json'))) {
+        if (!is_file($this->fileHandler->tempDir('packager.json'))) {
             return false;
         }
 
-        $rules = json_decode(file_get_contents($this->fileHandler->tempDir('package.json')));
+        $rules = json_decode(file_get_contents($this->fileHandler->tempDir('packager.json')));
 
         foreach ($rules as $orig => $dest) {
             if (!is_readable($this->fileHandler->tempDir($dest))) {
@@ -70,7 +83,7 @@ class Skeleton
             }
         }
 
-        unlink($this->fileHandler->tempDir('package.json'));
+        unlink($this->fileHandler->tempDir('packager.json'));
     }
 
     private function buildLicense()

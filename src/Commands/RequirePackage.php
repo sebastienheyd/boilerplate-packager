@@ -8,7 +8,7 @@ use Sebastienheyd\BoilerplatePackager\FileHandler;
 use Sebastienheyd\BoilerplatePackager\Package;
 use Sebastienheyd\BoilerplatePackager\Packagist;
 
-class InstallPackage extends Command
+class RequirePackage extends Command
 {
 
     /**
@@ -16,7 +16,7 @@ class InstallPackage extends Command
      *
      * @var string
      */
-    protected $signature = 'boilerplate:packager:install {package} {--dev}';
+    protected $signature = 'boilerplate:packager:require {package} {--dev}';
 
     /**
      * The console command description.

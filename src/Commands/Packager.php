@@ -57,7 +57,7 @@ class Packager extends Command
     {
         $action = $this->argument('action');
 
-        if (!in_array($action, ['new', 'install', 'remove', 'list'])) {
+        if (!in_array($action, ['create', 'require', 'remove', 'list'])) {
             $this->help();
             exit;
         }
@@ -84,8 +84,8 @@ class Packager extends Command
         $this->line('');
         $this->warn('Usage');
         $this->line('  <fg=green>boilerplate:package list</>                                   List all local packages.');
-        $this->line('  <fg=green>boilerplate:package new <package> [--dev]</>                  Create a new local package.');
-        $this->line('  <fg=green>boilerplate:package install <package|repository> [--dev]</>   Install an existing package.');
+        $this->line('  <fg=green>boilerplate:package create <package> [--dev]</>               Create a new local package.');
+        $this->line('  <fg=green>boilerplate:package require <package|repository> [--dev]</>   Install an existing package.');
         $this->line('  <fg=green>boilerplate:package remove <package></>                       Remove a locally installed package.');
         $this->line('');
         $this->warn('Arguments');

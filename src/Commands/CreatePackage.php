@@ -9,14 +9,14 @@ use Sebastienheyd\BoilerplatePackager\FileHandler;
 use Sebastienheyd\BoilerplatePackager\Packagist;
 use Sebastienheyd\BoilerplatePackager\Skeleton;
 
-class NewPackage extends Command
+class CreatePackage extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'boilerplate:packager:new {package}';
+    protected $signature = 'boilerplate:packager:create {package}';
 
     /**
      * The console command description.
@@ -95,12 +95,6 @@ class NewPackage extends Command
             'author_email'        => $this->forceAnswer('Author email'),
             'package_description' => $this->forceAnswer('Package description'),
             'license'             => $this->forceAnswer('License', 'MIT'),
-            'uc:vendor'           => Str::studly($vendor),
-            'uc:package'          => Str::studly($package),
-            'sc:vendor'           => Str::slug($vendor, '_'),
-            'sc:package'          => Str::slug($package, '_'),
-            'wd:package'          => mb_convert_case(Str::slug($package, ' '), MB_CASE_TITLE),
-            'wd:package'          => mb_convert_case(Str::slug($package, ' '), MB_CASE_TITLE),
             'vendor'              => $vendor,
             'package'             => $package,
             'date'                => date('Y_m_d_His'),
@@ -109,10 +103,6 @@ class NewPackage extends Command
 
         $resource = Str::singular($this->forceAnswer('Resource name'));
         $this->skeleton->assign([
-            'uc:pl:resource' => Str::plural(mb_convert_case(Str::slug($resource, ' '), MB_CASE_TITLE)),
-            'pl:resource' => Str::plural(Str::slug($resource, ' '), MB_CASE_TITLE),
-            'wd:resource' => mb_convert_case(Str::slug($resource, ' '), MB_CASE_TITLE),
-            'uc:resource' => Str::studly($resource),
             'resource'    => strtolower($resource),
         ]);
 
