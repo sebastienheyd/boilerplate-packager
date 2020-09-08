@@ -38,7 +38,7 @@ class Packager extends Command
     {
         parent::__construct();
 
-        if (!is_dir($fileHandler->packagesDir())) {
+        if (! is_dir($fileHandler->packagesDir())) {
             mkdir($fileHandler->packagesDir(), 0775, true);
             file_put_contents($fileHandler->packagesDir('.gitignore'), '.temp/');
         }
@@ -57,7 +57,7 @@ class Packager extends Command
     {
         $action = $this->argument('action');
 
-        if (!in_array($action, ['create', 'require', 'remove', 'list'])) {
+        if (! in_array($action, ['create', 'require', 'remove', 'list'])) {
             $this->help();
             exit;
         }
@@ -96,7 +96,6 @@ class Packager extends Command
 
         // Display all options with descriptions.
         foreach ($this->getDefinition()->getOptions() as $name => $option) {
-
             $shortCut = empty($option->getShortcut()) ? '' : '-'.$option->getShortcut().',';
 
             if (strlen($shortCut) <= 6) {
@@ -105,10 +104,7 @@ class Packager extends Command
                 $shortCut = '  '.$shortCut;
             }
 
-            $this->line('<fg=green>'.str_pad($shortCut.' --'.$name,
-                    25,
-                    ' ',
-                    STR_PAD_RIGHT).'</> '.$option->getDescription());
+            $this->line('<fg=green>'.str_pad($shortCut.' --'.$name, 25, ' ', STR_PAD_RIGHT).'</> '.$option->getDescription());
         };
     }
 }

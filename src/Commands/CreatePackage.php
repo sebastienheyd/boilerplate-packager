@@ -16,7 +16,7 @@ class CreatePackage extends Command
      *
      * @var string
      */
-    protected $signature = 'boilerplate:packager:create {package}';
+    protected $signature = 'boilerplate:packager:create {package} {--dev}';
 
     /**
      * The console command description.
@@ -69,7 +69,7 @@ class CreatePackage extends Command
         $package = Str::lower($this->argument('package'));
         $this->alert("Creating a new package $package");
 
-        if (!$this->packagist->checkFormat($package)) {
+        if (! $this->packagist->checkFormat($package)) {
             $this->error('Package name format must be vendor/package');
             exit;
         }
@@ -91,19 +91,19 @@ class CreatePackage extends Command
         [$vendor, $package] = explode('/', $package);
 
         $this->skeleton->assign([
-            'author_name'         => $this->forceAnswer('Author name'),
-            'author_email'        => $this->forceAnswer('Author email'),
+            'author_name' => $this->forceAnswer('Author name', config('boilerplate.packager.author_name')),
+            'author_email' => $this->forceAnswer('Author email', config('boilerplate.packager.author_email')),
             'package_description' => $this->forceAnswer('Package description'),
-            'license'             => $this->forceAnswer('License', 'MIT'),
-            'vendor'              => $vendor,
-            'package'             => $package,
-            'date'                => date('Y_m_d_His'),
-            'locale'              => config('boilerplate.app.locale'),
+            'license' => $this->forceAnswer('License', config('boilerplate.packager.license')),
+            'vendor' => $vendor,
+            'package' => $package,
+            'date' => date('Y_m_d_His'),
+            'locale' => config('boilerplate.app.locale'),
         ]);
 
         $resource = Str::singular($this->forceAnswer('Resource name'));
         $this->skeleton->assign([
-            'resource'    => strtolower($resource),
+            'resource' => strtolower($resource),
         ]);
 
         $this->info('Download package skeleton...');
@@ -112,17 +112,41 @@ class CreatePackage extends Command
         $this->info('Building package...');
         $this->skeleton->build();
 
-        //$this->fileHandler->removeDir($this->fileHandler->tempDir());
+        $src = $this->fileHandler->tempDir();
+        $dest = $this->fileHandler->packagesDir("$vendor/$package");
+        if (is_dir($dest)) {
+            if ($this->confirm("<fg=yellow>Package $vendor/$package is already installed, replace package?</>")) {
+                $this->fileHandler->removeDir($dest);
+            } else {
+                $this->fileHandler->removeDir($src);
+                exit;
+            }
+        }
+
+        $this->fileHandler->moveDir($src, $dest);
+
+        $this->info("Require package $vendor/$package...");
+        $this->composer->require("$vendor/$package:@dev", $this->option('dev'));
+
+        if (! is_link(base_path("vendor/$vendor/$package"))) {
+            $this->error('Package installed is not the local version!');
+            exit;
+        }
 
         $this->info('Package successfully created!');
     }
 
     private function forceAnswer($question, $default = null)
     {
+        if (empty($default)) {
+            $default = null;
+        }
+
         $result = $this->ask($question, $default);
 
-        if (!$result) {
+        if (! $result) {
             $this->error('Answer cannot be empty');
+
             return $this->forceAnswer($question, $default);
         }
 

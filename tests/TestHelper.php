@@ -8,20 +8,6 @@ use Symfony\Component\Process\Process;
 
 trait TestHelper
 {
-    protected function seeInConsoleOutput($expectedText)
-    {
-        $consoleOutput = $this->app[Kernel::class]->output();
-        $this->assertStringContainsString($expectedText, $consoleOutput,
-            "Did not see `{$expectedText}` in console output: `$consoleOutput`");
-    }
-
-    protected function doNotSeeInConsoleOutput($unExpectedText)
-    {
-        $consoleOutput = $this->app[Kernel::class]->output();
-        $this->assertStringNotContainsString($unExpectedText, $consoleOutput,
-            "Did not expect to see `{$unExpectedText}` in console output: `$consoleOutput`");
-    }
-
     /**
      * Create a modified copy of testbench to be used as a template.
      * Before each test, a fresh copy of the template is created.
@@ -47,6 +33,18 @@ trait TestHelper
         (new Process(['composer', 'install', '--no-dev'], self::TEST_APP_TEMPLATE))->run(function ($type, $buffer) {
             fwrite(STDOUT, $buffer);
         });
+    }
+
+    protected function seeInConsoleOutput($expectedText)
+    {
+        $consoleOutput = $this->app[Kernel::class]->output();
+        $this->assertStringContainsString($expectedText, $consoleOutput, "Did not see `{$expectedText}` in console output: `$consoleOutput`");
+    }
+
+    protected function doNotSeeInConsoleOutput($unExpectedText)
+    {
+        $consoleOutput = $this->app[Kernel::class]->output();
+        $this->assertStringNotContainsString($unExpectedText, $consoleOutput, "Did not expect to see `{$unExpectedText}` in console output: `$consoleOutput`");
     }
 
     protected function installTestApp()

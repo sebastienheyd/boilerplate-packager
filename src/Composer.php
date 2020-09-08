@@ -34,7 +34,7 @@ class Composer
 
     private function checkFormat($package)
     {
-        if (!preg_match('`^([A-Za-z0-9\-]*)/([A-Za-z0-9\-]*)(:[@a-z\-]*)?$`', $package, $m)) {
+        if (! preg_match('`^([A-Za-z0-9\-]*)/([A-Za-z0-9\-]*)(:[@a-z\-]*)?$`', $package, $m)) {
             throw new RuntimeException('Package name is not well formatted');
         }
     }
@@ -60,6 +60,7 @@ class Composer
                 $args[] = '--dev';
             }
             $args[] = $package;
+
             return $this->runProcess($args);
         }
 
@@ -73,8 +74,8 @@ class Composer
         }
 
         $params = json_encode([
-            'type'    => 'path',
-            'url'     => 'packages/*/*',
+            'type' => 'path',
+            'url' => 'packages/*/*',
             'options' => [
                 'symlink' => true,
             ],

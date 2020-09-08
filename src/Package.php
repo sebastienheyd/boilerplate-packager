@@ -5,7 +5,9 @@ namespace Sebastienheyd\BoilerplatePackager;
 class Package
 {
     public $url;
+
     public $vendor;
+
     public $name;
 
     public function parseFromUrl($url)
@@ -21,6 +23,7 @@ class Package
                 $this->url = $this->origin;
                 $this->vendor = $m[2];
                 $this->name = $m[3];
+
                 return $this;
             }
         }
@@ -30,7 +33,7 @@ class Package
 
     public function __get($name)
     {
-        if($name === 'temp_path') {
+        if ($name === 'temp_path') {
             return base_path('packages/.temp').'/'.$this->vendor.'/'.$this->name;
         }
 

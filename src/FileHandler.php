@@ -18,11 +18,11 @@ class FileHandler
 
     public function moveDir($source, $destination)
     {
-        if(!is_dir($source)) {
+        if (! is_dir($source)) {
             throw new RuntimeException('Source directory does not exists');
         }
 
-        if(!is_dir($destination)) {
+        if (! is_dir($destination)) {
             mkdir($destination, 0775, true);
         }
 
@@ -36,11 +36,11 @@ class FileHandler
      */
     public function removeDir($path)
     {
-        if(!preg_match('#^'.$this->packagesDir().'#', $path)) {
+        if (! preg_match('#^'.$this->packagesDir().'#', $path)) {
             throw new RuntimeException('Folder deletion forbidden');
         }
 
-        if(!is_dir($path)) {
+        if (! is_dir($path)) {
             return true;
         }
 

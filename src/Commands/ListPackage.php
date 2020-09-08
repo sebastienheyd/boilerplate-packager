@@ -10,7 +10,6 @@ use Symfony\Component\Process\Process;
 
 class ListPackage extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -70,38 +69,48 @@ class ListPackage extends Command
         $list = [];
 
         foreach (array_diff(scandir($path), ['.', '..']) as $vendor) {
-
-            if(!is_dir("$path/$vendor")) {
+            if (! is_dir("$path/$vendor")) {
                 continue;
             }
 
             foreach (array_diff(scandir("$path/$vendor"), ['.', '..']) as $name) {
-
                 if ($vendor === '.temp') {
                     $this->fileHandler->removeDir($this->fileHandler->tempDir());
                     continue;
                 }
 
                 $list["$vendor/$name"] = [
-                    'vendor'      => $vendor,
-                    'name'        => $name,
-                    'installed'   => 'no',
-                    'remote_url'  => '-',
-                    'branch'      => '-',
+                    'vendor' => $vendor,
+                    'name' => $name,
+                    'installed' => 'no',
+                    'remote_url' => '-',
+                    'branch' => '-',
                     'require-dev' => '-',
                 ];
 
-                (new Process(['git', 'branch'], "$path/$vendor/$name"))
-                    ->run(function ($type, $buffer) use (&$list, $vendor, $name) {
+                (new Process(['git', 'branch'], "$path/$vendor/$name"))->run(function (
+                    $type,
+                    $buffer
+                ) use (
+                    &$list,
+                    $vendor,
+                    $name
+                ) {
                         if (preg_match('`^\*\s(.*)$`m', $buffer, $m)) {
-                            $list["$vendor/$name"]['branch'] = $m[1];
+						$list["$vendor/$name"]['branch'] = $m[1];
                         }
-                    });
+                });
 
-                (new Process(['git', 'config', '--get', 'remote.origin.url'], "$path/$vendor/$name"))
-                    ->run(function ($type, $buffer) use (&$list, $vendor, $name) {
+                (new Process(['git', 'config', '--get', 'remote.origin.url'], "$path/$vendor/$name"))->run(function (
+                    $type,
+                    $buffer
+                ) use (
+                    &$list,
+                    $vendor,
+                    $name
+) {
                         $list["$vendor/$name"]['remote_url'] = trim($buffer);
-                    });
+                });
 
                 if (is_link(base_path("vendor/$vendor/$name"))) {
                     if (readlink(base_path("vendor/$vendor/$name")) === "../../packages/$vendor/$name") {

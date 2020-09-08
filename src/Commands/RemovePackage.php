@@ -9,7 +9,6 @@ use Sebastienheyd\BoilerplatePackager\Packagist;
 
 class RemovePackage extends Command
 {
-
     /**
      * The name and signature of the console command.
      *
@@ -67,20 +66,17 @@ class RemovePackage extends Command
         $package = $this->argument('package');
 
         // If is format vendor/name get information from packagist
-        if (!$this->packagist->checkFormat($package)) {
+        if (! $this->packagist->checkFormat($package)) {
             $this->error('The package format must be vendor/name');
             exit;
         }
 
-        if (!isset($this->composer->require->{$package}) && !isset($this->composer->{"require-dev"}->{$package})) {
+        if (! isset($this->composer->require->{$package}) && ! isset($this->composer->{"require-dev"}->{$package})) {
             $this->error('The package is not installed');
             exit;
         }
 
-        if (!is_dir($this->fileHandler->packagesDir($package)) ||
-            !is_link(base_path("vendor/$package")) ||
-            !(readlink(base_path("vendor/$package")) === "../../packages/$package")
-        ) {
+        if (! is_dir($this->fileHandler->packagesDir($package)) || ! is_link(base_path("vendor/$package")) || ! (readlink(base_path("vendor/$package")) === "../../packages/$package")) {
             $this->error('The installed package is not a local package, you have to remove it manually');
             exit;
         }

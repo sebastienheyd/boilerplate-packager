@@ -1,4 +1,4 @@
-.PHONY:help test clean
+.PHONY:help test cs csfix clean
 .DEFAULT_GOAL=help
 
 help:
@@ -11,7 +11,13 @@ composer.phar:
 vendor: composer.json
 	@./composer.phar update --optimize-autoloader --no-suggest
 
-tests: composer.phar vendor phpunit.xml ## Launch test
+cs: composer.phar vendor ## Check for coding standards
+	@php vendor/bin/phpcs
+
+csfix: composer.phar vendor ## Check and fix for coding standards
+	@php vendor/bin/phpcbf
+
+test: composer.phar vendor phpunit.xml ## Launch test
 	@php vendor/bin/phpunit
 
 clean: ## Remove files needed for tests

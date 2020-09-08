@@ -20,7 +20,8 @@
         "phpunit/phpunit": "^8.0",
         "mockery/mockery": "^1.1",
         "orchestra/testbench": "~3|~4",
-        "sempro/phpunit-pretty-print": "^1.0"
+        "sempro/phpunit-pretty-print": "^1.0",
+        "squizlabs/php_codesniffer": "^3.5"
     },
     "autoload": {
         "psr-4": {
