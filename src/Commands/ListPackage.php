@@ -82,10 +82,10 @@ class ListPackage extends Command
                 $list["$vendor/$name"] = [
                     'vendor' => $vendor,
                     'name' => $name,
-                    'installed' => 'no',
+                    'installed' => '',
                     'remote_url' => '-',
                     'branch' => '-',
-                    'require-dev' => '-',
+                    'require-dev' => '',
                 ];
 
                 (new Process(['git', 'branch'], "$path/$vendor/$name"))->run(function (

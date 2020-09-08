@@ -81,13 +81,17 @@ class RemovePackage extends Command
             exit;
         }
 
+        if (! $this->confirm("<bg=red>You are about to remove the package $package, are you sure?</>")) {
+            exit;
+        }
+
         $this->info("Removing package $package from composer...");
         $this->composer->remove($package);
 
         $this->info("Removing symlink vendor/$package...");
         unlink(base_path("vendor/$package"));
 
-        if ($this->confirm("Removing folder packages/$package?")) {
+        if ($this->confirm("<fg=yellow>Removing folder packages/$package?</>")) {
             $this->fileHandler->removeDir($this->fileHandler->packagesDir($package));
         }
 
