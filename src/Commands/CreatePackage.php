@@ -107,7 +107,7 @@ class CreatePackage extends Command
         ]);
 
         $this->info('Download package skeleton...');
-        $this->skeleton->download();
+        $this->skeleton->download(config('boilerplate.packager.skeleton'), config('boilerplate.packager.skeleton_branch'));
 
         $this->info('Building package...');
         $this->skeleton->build();

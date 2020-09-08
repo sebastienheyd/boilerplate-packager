@@ -33,10 +33,19 @@ class Skeleton
         return $this;
     }
 
-    public function download()
+    public function download($url, $branch)
     {
-        $this->recurse_copy($this->fileHandler->packagesDir('sebastienheyd/boilerplate-package-skeleton'), $this->fileHandler->tempDir());
+        if (is_dir($this->fileHandler->packagesDir('sebastienheyd/boilerplate-package-skeleton'))) {
+            $this->recurse_copy($this->fileHandler->packagesDir('sebastienheyd/boilerplate-package-skeleton'), $this->fileHandler->tempDir());
+
+            return true;
+        }
+
+        $tempPath = $this->fileHandler->tempDir();
+        exec("git clone -b $branch -q $url $tempPath", $output, $exit_code);
         $this->fileHandler->removeDir($this->fileHandler->tempDir('.git'));
+
+        return true;
     }
 
     private function recurse_copy($src, $dst)
@@ -60,6 +69,7 @@ class Skeleton
         $replacements = [];
         foreach ($this->assign as $k => $v) {
             $replacements['~uc:pl:'.$k] = Str::plural(mb_convert_case(Str::slug($v, ' '), MB_CASE_TITLE));
+            $replacements['~uc:wd:'.$k] = mb_convert_case(Str::slug($v, ' '), MB_CASE_TITLE);
             $replacements['~uc:'.$k] = Str::studly($v);
             $replacements['~sc:'.$k] = Str::slug($v, '_');
             $replacements['~wd:'.$k] = mb_convert_case(Str::slug($v, ' '), MB_CASE_TITLE);
