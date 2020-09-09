@@ -14,44 +14,48 @@ trait TestHelper
      */
     private static function setUpLocalTestbench()
     {
-        fwrite(STDOUT, "Setting up test environment for first use.\n");
+        if (! file_exists(self::TEST_APP_TEMPLATE)) {
+            fwrite(STDOUT, "Setting up test environment for first use.\n");
+            $files = new Filesystem();
+            $files->makeDirectory(self::TEST_APP_TEMPLATE, 0755, true);
+            $original = __DIR__.'/../vendor/orchestra/testbench-core/laravel/';
+            $files->copyDirectory($original, self::TEST_APP_TEMPLATE);
+
+            // Modify the composer.json file
+            $composer = json_decode($files->get(self::TEST_APP_TEMPLATE.'/composer.json'), true);
+
+            // Remove "tests/TestCase.php" from autoload (it doesn't exist)
+            unset($composer['autoload']['classmap'][1]);
+
+            // Pre-install illuminate/support
+            $composer['require'] = ['illuminate/support' => '~5|~6|~7'];
+
+            // Install stable version
+            $composer['minimum-stability'] = 'stable';
+            $files->put(self::TEST_APP_TEMPLATE.'/composer.json', json_encode($composer, JSON_PRETTY_PRINT));
+
+            // Install dependencies
+            fwrite(STDOUT, "Installing test environment dependencies\n");
+            (new Process(['composer', 'install', '--no-dev'], self::TEST_APP_TEMPLATE))->run(function ($type, $buffer) {
+                fwrite(STDOUT, $buffer);
+            });
+        }
+
+        (new Filesystem())->copyDirectory(self::TEST_APP_TEMPLATE, self::TEST_APP);
+    }
+
+    private static function removeTestbench()
+    {
         $files = new Filesystem();
-        $files->makeDirectory(self::TEST_APP_TEMPLATE, 0755, true);
-        $original = __DIR__.'/../vendor/orchestra/testbench-core/laravel/';
-        $files->copyDirectory($original, self::TEST_APP_TEMPLATE);
-        // Modify the composer.json file
-        $composer = json_decode($files->get(self::TEST_APP_TEMPLATE.'/composer.json'), true);
-        // Remove "tests/TestCase.php" from autoload (it doesn't exist)
-        unset($composer['autoload']['classmap'][1]);
-        // Pre-install illuminate/support
-        $composer['require'] = ['illuminate/support' => '~5'];
-        // Install stable version
-        $composer['minimum-stability'] = 'stable';
-        $files->put(self::TEST_APP_TEMPLATE.'/composer.json', json_encode($composer, JSON_PRETTY_PRINT));
-        // Install dependencies
-        fwrite(STDOUT, "Installing test environment dependencies\n");
-        (new Process(['composer', 'install', '--no-dev'], self::TEST_APP_TEMPLATE))->run(function ($type, $buffer) {
-            fwrite(STDOUT, $buffer);
-        });
-    }
-
-    protected function seeInConsoleOutput($expectedText)
-    {
-        $consoleOutput = $this->app[Kernel::class]->output();
-        $this->assertStringContainsString($expectedText, $consoleOutput, "Did not see `{$expectedText}` in console output: `$consoleOutput`");
-    }
-
-    protected function doNotSeeInConsoleOutput($unExpectedText)
-    {
-        $consoleOutput = $this->app[Kernel::class]->output();
-        $this->assertStringNotContainsString($unExpectedText, $consoleOutput, "Did not expect to see `{$unExpectedText}` in console output: `$consoleOutput`");
+        if ($files->exists(self::TEST_APP)) {
+            $files->deleteDirectory(self::TEST_APP);
+        }
     }
 
     protected function installTestApp()
     {
         $this->uninstallTestApp();
-        $files = new Filesystem();
-        $files->copyDirectory(self::TEST_APP_TEMPLATE, self::TEST_APP);
+        (new Filesystem())->copyDirectory(self::TEST_APP_TEMPLATE, self::TEST_APP);
     }
 
     protected function uninstallTestApp()

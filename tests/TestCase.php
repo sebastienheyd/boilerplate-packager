@@ -14,28 +14,15 @@ abstract class TestCase extends TestBench
 
     public static function setUpBeforeClass(): void
     {
-        if (! file_exists(self::TEST_APP_TEMPLATE)) {
-            self::setUpLocalTestbench();
-        }
+        self::removeTestbench();
+        self::setUpLocalTestbench();
         parent::setUpBeforeClass();
     }
 
-    /**
-     * Setup before each test.
-     */
-    public function setUp(): void
+    public static function tearDownAfterClass(): void
     {
-        $this->installTestApp();
-        parent::setUp();
-    }
-
-    /**
-     * Tear down after each test.
-     */
-    public function tearDown(): void
-    {
-        $this->uninstallTestApp();
-        parent::tearDown();
+        //self::removeTestbench();
+        parent::tearDownAfterClass();
     }
 
     protected function getBasePath()
@@ -48,8 +35,8 @@ abstract class TestCase extends TestBench
      *
      * @return array
      */
-    protected function getPackageProviders()
+    protected function getPackageProviders($app)
     {
-        return [Sebastienheyd\BoilerplatePackager\ServiceProvider::class];
+        return ['Sebastienheyd\BoilerplatePackager\ServiceProvider'];
     }
 }

@@ -96,9 +96,9 @@ class ListPackage extends Command
                     $vendor,
                     $name
                 ) {
-                        if (preg_match('`^\*\s(.*)$`m', $buffer, $m)) {
-						$list["$vendor/$name"]['branch'] = $m[1];
-                        }
+                    if (preg_match('`^\*\s(.*)$`m', $buffer, $m)) {
+                        $list["$vendor/$name"]['branch'] = $m[1];
+                    }
                 });
 
                 (new Process(['git', 'config', '--get', 'remote.origin.url'], "$path/$vendor/$name"))->run(function (
@@ -108,8 +108,8 @@ class ListPackage extends Command
                     &$list,
                     $vendor,
                     $name
-) {
-                        $list["$vendor/$name"]['remote_url'] = trim($buffer);
+                ) {
+                    $list["$vendor/$name"]['remote_url'] = trim($buffer);
                 });
 
                 if (is_link(base_path("vendor/$vendor/$name"))) {

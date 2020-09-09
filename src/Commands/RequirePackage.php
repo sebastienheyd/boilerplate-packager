@@ -72,7 +72,7 @@ class RequirePackage extends Command
             $this->info('Getting package information from packagist.org...');
             if (! $this->packagist->exists($url)) {
                 $this->error('Package does not exists on packagist.org');
-                exit;
+                return 1;
             }
 
             $package = $this->packagist->getPackageInformation($url);
@@ -83,7 +83,7 @@ class RequirePackage extends Command
         // Get information from the given repository URL
         if (! ($package = $this->package->parseFromUrl($url))) {
             $this->error('Package name or repository URL is invalid');
-            exit;
+            return 1;
         }
 
         // Clone in temporary folder
@@ -96,7 +96,7 @@ class RequirePackage extends Command
         if (! is_file($package->temp_path.'/composer.json')) {
             $this->error('Package has no composer.json file, abort !');
             $this->fileHandler->removeDir($this->fileHandler->tempDir());
-            exit;
+            return 1;
         }
 
         $composer = json_decode(file_get_contents($package->temp_path.'/composer.json'));
@@ -108,7 +108,7 @@ class RequirePackage extends Command
         if (is_dir($this->fileHandler->packagesDir("$vendor/$name"))) {
             if (! $this->confirm('<fg=yellow>The package already exists in local folder, require current local package?</>')) {
                 if (! $this->confirm('<fg=yellow>Clear local package and install the downloaded one?</>')) {
-                    exit;
+                    return 0;
                 } else {
                     $this->fileHandler->removeDir($this->fileHandler->packagesDir("$vendor/$name"));
                     $this->fileHandler->moveDir($tempPath, $this->fileHandler->packagesDir("$vendor/$name"));
@@ -125,7 +125,7 @@ class RequirePackage extends Command
 
         if (! is_link(base_path("vendor/$vendor/$name"))) {
             $this->error('Package installed is not the local version!');
-            exit;
+            return 1;
         }
 
         $this->info('Package installed successfully!');

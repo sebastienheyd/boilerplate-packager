@@ -71,17 +71,17 @@ class CreatePackage extends Command
 
         if (! $this->packagist->checkFormat($package)) {
             $this->error('Package name format must be vendor/package');
-            exit;
+            return 1;
         }
 
         $this->getOutput()->write('<fg=green>Checking if package already exists on packagist... </>');
         if ($this->packagist->exists($package)) {
             $this->getOutput()->write(PHP_EOL);
             if ($this->confirm('Package already exists on packagist, do you want to install it?')) {
-                $this->getApplication()->addCommands([$this->resolveCommand(__NAMESPACE__.'\\InstallPackage')]);
-                $this->call('boilerplate:packager:install', ['package' => $package]);
+                $this->getApplication()->addCommands([$this->resolveCommand(__NAMESPACE__.'\\RequirePackage')]);
+                return $this->call('boilerplate:packager:require', ['package' => $package]);
             }
-            exit;
+            return 0;
         } else {
             $this->getOutput()->write('<fg=green>ok</>');
         }
@@ -92,7 +92,7 @@ class CreatePackage extends Command
 
         $this->skeleton->assign([
             'author_name' => $this->forceAnswer('Author name', config('boilerplate.packager.author_name')),
-            'author_email' => $this->forceAnswer('Author email', config('boilerplate.packager.author_email')),
+            'author_email' => $this->forceAnswer('Author e-mail', config('boilerplate.packager.author_email')),
             'package_description' => $this->forceAnswer('Package description'),
             'license' => $this->forceAnswer('License', config('boilerplate.packager.license')),
             'vendor' => $vendor,
@@ -119,7 +119,7 @@ class CreatePackage extends Command
                 $this->fileHandler->removeDir($dest);
             } else {
                 $this->fileHandler->removeDir($src);
-                exit;
+                return 0;
             }
         }
 
@@ -130,7 +130,7 @@ class CreatePackage extends Command
 
         if (! is_link(base_path("vendor/$vendor/$package"))) {
             $this->error('Package installed is not the local version!');
-            exit;
+            return 1;
         }
 
         $this->info('Package successfully created!');

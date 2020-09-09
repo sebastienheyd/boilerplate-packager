@@ -22,7 +22,7 @@ class Packager extends Command
      *
      * @var string
      */
-    protected $description = 'Manage package for sebastienheyd/boilerplate';
+    protected $description = 'Manage packages for sebastienheyd/boilerplate';
 
     /**
      * @var FileHandler
@@ -59,7 +59,7 @@ class Packager extends Command
 
         if (! in_array($action, ['create', 'require', 'remove', 'list'])) {
             $this->help();
-            exit;
+            return 0;
         }
 
         $this->getApplication()->addCommands([$this->resolveCommand(__NAMESPACE__.'\\'.ucfirst($action).'Package')]);
@@ -74,7 +74,7 @@ class Packager extends Command
             $args['--dev'] = true;
         }
 
-        $this->call('boilerplate:packager:'.$action, $args);
+        return $this->call('boilerplate:packager:'.$action, $args);
     }
 
     public function help()

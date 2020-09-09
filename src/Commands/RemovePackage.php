@@ -3,6 +3,7 @@
 namespace Sebastienheyd\BoilerplatePackager\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Filesystem\Filesystem;
 use Sebastienheyd\BoilerplatePackager\Composer;
 use Sebastienheyd\BoilerplatePackager\FileHandler;
 use Sebastienheyd\BoilerplatePackager\Packagist;
@@ -14,7 +15,7 @@ class RemovePackage extends Command
      *
      * @var string
      */
-    protected $signature = 'boilerplate:packager:remove {package}';
+    protected $signature = 'boilerplate:packager:remove {package?}';
 
     /**
      * The console command description.
@@ -64,6 +65,21 @@ class RemovePackage extends Command
     public function handle()
     {
         $package = $this->argument('package');
+
+        if(! $package) {
+            $choices = [];
+            $path = $this->fileHandler->packagesDir();
+            foreach (array_diff(scandir($path), ['.', '..']) as $vendor) {
+                if (! is_dir("$path/$vendor")) {
+                    continue;
+                }
+
+                foreach (array_diff(scandir("$path/$vendor"), ['.', '..']) as $name) {
+                    $choices[] = "$vendor/$name";
+                }
+            }
+            $package = $this->choice('Which package do you want to remove?', $choices);
+        }
 
         // If is format vendor/name get information from packagist
         if (! $this->packagist->checkFormat($package)) {
