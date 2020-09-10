@@ -3,7 +3,6 @@
 namespace Sebastienheyd\BoilerplatePackager\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
 use Sebastienheyd\BoilerplatePackager\Composer;
 use Sebastienheyd\BoilerplatePackager\FileHandler;
 use Sebastienheyd\BoilerplatePackager\Packagist;
@@ -66,7 +65,7 @@ class RemovePackage extends Command
     {
         $package = $this->argument('package');
 
-        if(! $package) {
+        if (! $package) {
             $choices = [];
             $path = $this->fileHandler->packagesDir();
             foreach (array_diff(scandir($path), ['.', '..']) as $vendor) {
@@ -84,25 +83,32 @@ class RemovePackage extends Command
         // If is format vendor/name get information from packagist
         if (! $this->packagist->checkFormat($package)) {
             $this->error('The package format must be vendor/name');
-            exit;
+
+            return 1;
         }
 
         if (! isset($this->composer->require->{$package}) && ! isset($this->composer->{"require-dev"}->{$package})) {
             $this->error('The package is not installed');
-            exit;
+
+            return 1;
         }
 
         if (! is_dir($this->fileHandler->packagesDir($package)) || ! is_link(base_path("vendor/$package")) || ! (readlink(base_path("vendor/$package")) === "../../packages/$package")) {
             $this->error('The installed package is not a local package, you have to remove it manually');
-            exit;
+
+            return 1;
         }
 
         if (! $this->confirm("<bg=red>You are about to remove the package $package, are you sure?</>")) {
-            exit;
+            return 0;
         }
 
         $this->info("Removing package $package from composer...");
-        $this->composer->remove($package);
+        if (! $this->composer->remove($package)) {
+            $this->error('Fail to remove from composer!');
+
+            return 1;
+        }
 
         $this->info("Removing symlink vendor/$package...");
         unlink(base_path("vendor/$package"));

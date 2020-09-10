@@ -43,7 +43,7 @@ class Skeleton
 
         $tempPath = $this->fileHandler->tempDir();
         exec("git clone -b $branch -q $url $tempPath", $output, $exit_code);
-        $this->fileHandler->removeDir($this->fileHandler->tempDir('.git'));
+        $this->fileHandler->removeDir($tempPath.'/.git');
 
         return true;
     }

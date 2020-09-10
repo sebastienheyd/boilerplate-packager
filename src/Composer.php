@@ -25,11 +25,19 @@ class Composer
     {
         $this->checkFormat($package);
 
+        $options = ['composer', 'remove', '--no-update'];
+
         if (isset($this->{"require-dev"}->{$package})) {
-            return $this->runProcess(['composer', 'remove', '--dev', $package]);
+            $options[] = '--dev';
         }
 
-        return $this->runProcess(['composer', 'remove', $package]);
+        $options[] = $package;
+
+        if ($this->runProcess($options)) {
+            return $this->runProcess(['composer', 'update', $package]);
+        }
+
+        return false;
     }
 
     private function checkFormat($package)

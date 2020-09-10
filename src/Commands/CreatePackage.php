@@ -78,8 +78,7 @@ class CreatePackage extends Command
         if ($this->packagist->exists($package)) {
             $this->getOutput()->write(PHP_EOL);
             if ($this->confirm('Package already exists on packagist, do you want to install it?')) {
-                $this->getApplication()->addCommands([$this->resolveCommand(__NAMESPACE__.'\\RequirePackage')]);
-                return $this->call('boilerplate:packager:require', ['package' => $package]);
+                return $this->call('boilerplate:packager', ['action' => 'require', 'package' => $package]);
             }
             return 0;
         } else {

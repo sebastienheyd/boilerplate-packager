@@ -2,7 +2,6 @@
 
 namespace Sebastienheyd\BoilerplatePackager\Tests;
 
-use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 
@@ -28,15 +27,21 @@ trait TestHelper
             unset($composer['autoload']['classmap'][1]);
 
             // Pre-install illuminate/support
-            $composer['require'] = ['illuminate/support' => '~5|~6|~7'];
+            $composer['require'] = ['illuminate/support' => '~7'];
+            $composer['require-dev'] = new \StdClass();
 
             // Install stable version
             $composer['minimum-stability'] = 'stable';
+            $composer['prefer-stable'] = true;
             $files->put(self::TEST_APP_TEMPLATE.'/composer.json', json_encode($composer, JSON_PRETTY_PRINT));
 
             // Install dependencies
             fwrite(STDOUT, "Installing test environment dependencies\n");
             (new Process(['composer', 'install', '--no-dev'], self::TEST_APP_TEMPLATE))->run(function ($type, $buffer) {
+                fwrite(STDOUT, $buffer);
+            });
+
+            (new Process(['git', 'init'], self::TEST_APP_TEMPLATE))->run(function ($type, $buffer) {
                 fwrite(STDOUT, $buffer);
             });
         }
@@ -50,6 +55,17 @@ trait TestHelper
         if ($files->exists(self::TEST_APP)) {
             $files->deleteDirectory(self::TEST_APP);
         }
+    }
+
+    /**
+     * @return bool
+     */
+    protected function runProcess(array $command)
+    {
+        $process = new Process($command, self::TEST_APP);
+        $process->run();
+
+        return $process->getExitCode() === 0;
     }
 
     protected function installTestApp()
