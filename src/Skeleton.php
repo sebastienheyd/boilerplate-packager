@@ -35,8 +35,8 @@ class Skeleton
 
     public function download($url, $branch)
     {
-        if (is_dir($this->fileHandler->packagesDir('sebastienheyd/boilerplate-package-skeleton'))) {
-            $this->recurse_copy($this->fileHandler->packagesDir('sebastienheyd/boilerplate-package-skeleton'), $this->fileHandler->tempDir());
+        if (is_dir($url)) {
+            $this->recurse_copy($url, $this->fileHandler->tempDir());
 
             return true;
         }

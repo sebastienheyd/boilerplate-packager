@@ -138,7 +138,7 @@ class RequirePackage extends Command
         $this->fileHandler->removeDir($this->fileHandler->tempDir());
 
         $this->info("Require package $vendor/$name...");
-        if(! $this->composer->require("$vendor/$name:@dev", $this->option('dev'))) {
+        if (! $this->composer->require("$vendor/$name:@dev", $this->option('dev'))) {
             $this->error('Package installation failed, require has failed!');
 
             return 1;
