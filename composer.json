@@ -9,7 +9,7 @@
         }
     ],
     "homepage": "https://github.com/sebastienheyd/boilerplate-packager",
-    "keywords": ["laravel","boilerplate','packager"],
+    "keywords": ["laravel","boilerplate","packager"],
     "require": {
         "ext-curl": "*",
         "ext-json": "*",
