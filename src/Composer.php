@@ -4,6 +4,7 @@ namespace Sebastienheyd\BoilerplatePackager;
 
 use RuntimeException;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class Composer
 {
@@ -71,6 +72,10 @@ class Composer
     {
         $process = new Process($command, base_path());
         $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
 
         return $process->getExitCode() === 0;
     }
