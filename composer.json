@@ -1,15 +1,15 @@
 {
     "name": "sebastienheyd/boilerplate-packager",
-    "description": "Generate package for sebastienheyd/boilerplate",
-    "license": "license",
+    "description": "Generate and manage packages for sebastienheyd/boilerplate",
+    "license": "MIT",
     "authors": [
         {
-            "name": "Sébastien Heyd",
+            "name": "Sebastien Heyd",
             "email": "contact@sheyd.fr"
         }
     ],
     "homepage": "https://github.com/sebastienheyd/boilerplate-packager",
-    "keywords": ["Laravel", "Boilerplate', 'Packager"],
+    "keywords": ["laravel","boilerplate','packager"],
     "require": {
         "ext-curl": "*",
         "ext-json": "*",
