@@ -2,8 +2,6 @@
 
 namespace Sebastienheyd\BoilerplatePackager\Tests;
 
-use Illuminate\Support\Facades\Artisan;
-
 class PackagerTest extends TestCase
 {
     public function testNoAction()
@@ -130,9 +128,9 @@ class PackagerTest extends TestCase
             ->assertExitCode(1);
 
         $composer = $this->getComposer();
-        $this->assertTrue(!is_link(self::TEST_APP.'/vendor/sebastienheyd/docker-self-signed-proxy-companion'));
-        $this->assertTrue(!is_dir(self::TEST_APP.'/packages/sebastienheyd/docker-self-signed-proxy-companion'));
-        $this->assertTrue(!isset($composer['require']['sebastienheyd/docker-self-signed-proxy-companion']));
+        $this->assertTrue(! is_link(self::TEST_APP.'/vendor/sebastienheyd/docker-self-signed-proxy-companion'));
+        $this->assertTrue(! is_dir(self::TEST_APP.'/packages/sebastienheyd/docker-self-signed-proxy-companion'));
+        $this->assertTrue(! isset($composer['require']['sebastienheyd/docker-self-signed-proxy-companion']));
     }
 
     public function testRequirePackageAlreadyExistsLocally()
@@ -240,6 +238,7 @@ class PackagerTest extends TestCase
     private function getComposer()
     {
         $content = file_get_contents(self::TEST_APP.'/composer.json');
+
         return json_decode($content, true);
     }
 }

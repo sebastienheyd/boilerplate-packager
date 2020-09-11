@@ -46,7 +46,7 @@ class Composer
 
         $options = ['composer', 'remove', $package, '--no-update'];
 
-        if (isset($this->{"require-dev"}->{$package})) {
+        if (isset($this->{'require-dev'}->{$package})) {
             $options[] = '--dev';
         }
 
