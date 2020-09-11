@@ -59,6 +59,18 @@ class CreatePackage extends Command
         $this->skeleton = $skeleton;
     }
 
+    public function info($string, $verbosity = null): void
+    {
+        fwrite(STDERR, PHP_EOL.$string.PHP_EOL);
+        parent::info($string, $verbosity);
+    }
+
+    public function error($string, $verbosity = null): void
+    {
+        fwrite(STDERR, PHP_EOL.$string.PHP_EOL);
+        parent::error($string, $verbosity);
+    }
+
     /**
      * Execute the console command.
      *
@@ -71,7 +83,7 @@ class CreatePackage extends Command
 
         if (! $this->packagist->checkFormat($package)) {
             $this->error('Package name format must be vendor/package');
-            fwrite(STDERR, 'Package name format must be vendor/package');
+
             return 1;
         }
 
@@ -132,7 +144,7 @@ class CreatePackage extends Command
 
         if (! is_link(base_path("vendor/$vendor/$package"))) {
             $this->error('Package installed is not the local version!');
-            fwrite(STDERR, 'Package installed is not the local version!');
+
             return 1;
         }
 
