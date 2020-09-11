@@ -59,18 +59,6 @@ class CreatePackage extends Command
         $this->skeleton = $skeleton;
     }
 
-    public function info($string, $verbosity = null): void
-    {
-        fwrite(STDERR, PHP_EOL.$string.PHP_EOL);
-        parent::info($string, $verbosity);
-    }
-
-    public function error($string, $verbosity = null): void
-    {
-        fwrite(STDERR, PHP_EOL.$string.PHP_EOL);
-        parent::error($string, $verbosity);
-    }
-
     /**
      * Execute the console command.
      *
