@@ -18,7 +18,7 @@ csfix: composer.phar vendor ## Check and fix for coding standards
 	@php vendor/bin/phpcbf
 
 test: composer.phar vendor phpunit.xml ## Launch test
-	@php vendor/bin/phpunit
+	@php vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
 
 clean: ## Remove files needed for tests
 	@rm -rf report testbench vendor .phpunit.result.cache composer.lock composer.phar

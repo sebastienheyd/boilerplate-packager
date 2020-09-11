@@ -21,7 +21,7 @@ abstract class TestCase extends TestBench
 
     public static function tearDownAfterClass(): void
     {
-        //self::removeTestbench();
+        self::removeTestbench();
         parent::tearDownAfterClass();
     }
 
