@@ -71,7 +71,7 @@ class CreatePackage extends Command
 
         if (! $this->packagist->checkFormat($package)) {
             $this->error('Package name format must be vendor/package');
-            throw new \Exception('Package name format must be vendor/package');
+            fwrite(STDERR, 'Package name format must be vendor/package');
             return 1;
         }
 
@@ -132,7 +132,7 @@ class CreatePackage extends Command
 
         if (! is_link(base_path("vendor/$vendor/$package"))) {
             $this->error('Package installed is not the local version!');
-            throw new \Exception('Package installed is not the local version!');
+            fwrite(STDERR, 'Package installed is not the local version!');
             return 1;
         }
 

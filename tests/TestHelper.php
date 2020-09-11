@@ -14,7 +14,7 @@ trait TestHelper
     private static function setUpLocalTestbench()
     {
         if (! file_exists(self::TEST_APP_TEMPLATE)) {
-            fwrite(STDOUT, "Setting up test environment for first use.\n");
+            fwrite(STDOUT, "Setting up test environment for first use.".PHP_EOL);
             $files = new Filesystem();
             $files->makeDirectory(self::TEST_APP_TEMPLATE, 0755, true);
             $original = __DIR__.'/../vendor/orchestra/testbench-core/laravel/';
