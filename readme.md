@@ -2,6 +2,7 @@
 
 [![Version](https://img.shields.io/packagist/v/sebastienheyd/boilerplate-packager.svg?style=flat-square)](https://packagist.org/packages/sebastienheyd/boilerplate-packager)
 [![Downloads](https://img.shields.io/packagist/dt/sebastienheyd/boilerplate-packager.svg?style=flat-square)](https://packagist.org/packages/sebastienheyd/boilerplate-packager)
+[![Travis](https://img.shields.io/travis/sebastienheyd/boilerplate-packager/master.svg?style=flat-square)](https://travis-ci.org/sebastienheyd/boilerplate-packager)
 [![StyleCI](https://styleci.io/repos/292614089/shield)](https://styleci.io/repos/292614089)
 [![Scrutinizer](https://scrutinizer-ci.com/g/sebastienheyd/boilerplate-packager/badges/quality-score.png?b=master&style=flat-square)](https://scrutinizer-ci.com/g/sebastienheyd/boilerplate-packager/?branch=master)
 [![License](https://img.shields.io/github/license/sebastienheyd/boilerplate-packager.svg)](license.md)
