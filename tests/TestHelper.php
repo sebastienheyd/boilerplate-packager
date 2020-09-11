@@ -14,7 +14,7 @@ trait TestHelper
     private static function setUpLocalTestbench()
     {
         if (! file_exists(self::TEST_APP_TEMPLATE)) {
-            fwrite(STDOUT, "Setting up test environment for first use.".PHP_EOL);
+            fwrite(STDOUT, 'Setting up test environment for first use.'.PHP_EOL);
             $files = new Filesystem();
             $files->makeDirectory(self::TEST_APP_TEMPLATE, 0755, true);
             $original = __DIR__.'/../vendor/orchestra/testbench-core/laravel/';
@@ -33,7 +33,7 @@ trait TestHelper
             // Install stable version
             $composer['minimum-stability'] = 'stable';
             $composer['prefer-stable'] = true;
-            $files->put(self::TEST_APP_TEMPLATE.'/composer.json', json_encode($composer, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
+            $files->put(self::TEST_APP_TEMPLATE.'/composer.json', json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
             // Install dependencies
             fwrite(STDOUT, "Installing test environment dependencies\n");
