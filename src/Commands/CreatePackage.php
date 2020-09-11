@@ -71,6 +71,7 @@ class CreatePackage extends Command
 
         if (! $this->packagist->checkFormat($package)) {
             $this->error('Package name format must be vendor/package');
+
             return 1;
         }
 
@@ -80,6 +81,7 @@ class CreatePackage extends Command
             if ($this->confirm('Package already exists on packagist, do you want to install it?')) {
                 return $this->call('boilerplate:packager', ['action' => 'require', 'package' => $package]);
             }
+
             return 0;
         } else {
             $this->getOutput()->write('<fg=green>ok</>');
@@ -118,6 +120,7 @@ class CreatePackage extends Command
                 $this->fileHandler->removeDir($dest);
             } else {
                 $this->fileHandler->removeDir($src);
+
                 return 0;
             }
         }
@@ -129,6 +132,7 @@ class CreatePackage extends Command
 
         if (! is_link(base_path("vendor/$vendor/$package"))) {
             $this->error('Package installed is not the local version!');
+
             return 1;
         }
 

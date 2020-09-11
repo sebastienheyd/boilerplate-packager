@@ -59,6 +59,7 @@ class Packager extends Command
 
         if (! in_array($action, ['create', 'require', 'remove', 'list'])) {
             $this->help();
+
             return 0;
         }
 
@@ -105,6 +106,6 @@ class Packager extends Command
             }
 
             $this->line('<fg=green>'.str_pad($shortCut.' --'.$name, 25, ' ', STR_PAD_RIGHT).'</> '.$option->getDescription());
-        };
+        }
     }
 }

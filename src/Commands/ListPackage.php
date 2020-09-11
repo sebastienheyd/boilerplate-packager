@@ -118,7 +118,7 @@ class ListPackage extends Command
                     }
                 }
 
-                if (isset($this->composer->{"require-dev"}->{"$vendor/$name"})) {
+                if (isset($this->composer->{'require-dev'}->{"$vendor/$name"})) {
                     $list["$vendor/$name"]['require-dev'] = 'yes';
                 }
             }
