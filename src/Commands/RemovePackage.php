@@ -87,14 +87,14 @@ class RemovePackage extends Command
             return 1;
         }
 
-        if (! isset($this->composer->require->{$package}) && ! isset($this->composer->{"require-dev"}->{$package})) {
-            $this->error('The package is not installed');
+        if (! $this->composer->isInstalled($package)) {
+            $this->error("The package $package is not installed!");
 
             return 1;
         }
 
-        if (! is_dir($this->fileHandler->packagesDir($package)) || ! is_link(base_path("vendor/$package")) || ! (readlink(base_path("vendor/$package")) === "../../packages/$package")) {
-            $this->error('The installed package is not a local package, you have to remove it manually');
+        if (! is_dir($this->fileHandler->packagesDir($package))) {
+            $this->error("The package $package is not a local package, you have to remove it manually!");
 
             return 1;
         }
@@ -110,8 +110,10 @@ class RemovePackage extends Command
             return 1;
         }
 
-        $this->info("Removing symlink vendor/$package...");
-        unlink(base_path("vendor/$package"));
+        if (is_link(base_path("vendor/$package"))) {
+            $this->info("Removing symlink vendor/$package...");
+            unlink(base_path("vendor/$package"));
+        }
 
         if ($this->confirm("<fg=yellow>Removing folder packages/$package?</>")) {
             $this->fileHandler->removeDir($this->fileHandler->packagesDir($package));

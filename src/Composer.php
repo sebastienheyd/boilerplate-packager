@@ -21,17 +21,34 @@ class Composer
         }
     }
 
+    public function isInstalled($package)
+    {
+        $lock = json_decode(file_get_contents(base_path('composer.lock')), true);
+
+        foreach ($lock['packages'] as $p) {
+            if ($p['name'] === $package) {
+                return true;
+            }
+        }
+
+        foreach ($lock['packages-dev'] as $p) {
+            if ($p['name'] === $package) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function remove($package)
     {
         $this->checkFormat($package);
 
-        $options = ['composer', 'remove', '--no-update'];
+        $options = ['composer', 'remove', $package, '--no-update'];
 
         if (isset($this->{"require-dev"}->{$package})) {
             $options[] = '--dev';
         }
-
-        $options[] = $package;
 
         if ($this->runProcess($options)) {
             return $this->runProcess(['composer', 'update', $package]);
@@ -63,11 +80,11 @@ class Composer
         $this->checkFormat($package);
 
         if ($this->addPackagesPath()) {
-            $args = ['composer', 'require'];
+            $args = ['composer', 'require', $package];
+
             if ($dev) {
                 $args[] = '--dev';
             }
-            $args[] = $package;
 
             return $this->runProcess($args);
         }
