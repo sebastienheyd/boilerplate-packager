@@ -33,7 +33,7 @@ trait TestHelper
             // Install stable version
             $composer['minimum-stability'] = 'stable';
             $composer['prefer-stable'] = true;
-            $files->put(self::TEST_APP_TEMPLATE.'/composer.json', json_encode($composer, JSON_PRETTY_PRINT));
+            $files->put(self::TEST_APP_TEMPLATE.'/composer.json', json_encode($composer, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
 
             // Install dependencies
             fwrite(STDOUT, "Installing test environment dependencies\n");
@@ -54,6 +54,9 @@ trait TestHelper
         $files = new Filesystem();
         if ($files->exists(self::TEST_APP)) {
             $files->deleteDirectory(self::TEST_APP);
+        }
+        if ($files->exists(self::TEST_APP_TEMPLATE)) {
+            $files->deleteDirectory(self::TEST_APP_TEMPLATE);
         }
     }
 
