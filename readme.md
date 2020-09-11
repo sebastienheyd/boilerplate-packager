@@ -1,9 +1,11 @@
 # Package manager for [sebastienheyd/boilerplate](https://github.com/sebastienheyd/boilerplate).
 
-[![Latest Version on Packagist][ico-version]][link-packagist]
-[![Total Downloads][ico-downloads]][link-downloads]
-[![Build Status][ico-travis]][link-travis]
-[![StyleCI][ico-styleci]][link-styleci]
+[![Version](https://img.shields.io/packagist/v/sebastienheyd/boilerplate-packager.svg?style=flat-square)](https://packagist.org/packages/sebastienheyd/boilerplate-packager)
+[![Downloads](https://img.shields.io/packagist/dt/sebastienheyd/boilerplate-packager.svg?style=flat-square)](https://packagist.org/packages/sebastienheyd/boilerplate-packager)
+[![Travis](https://img.shields.io/travis/sebastienheyd/boilerplate-packager/master.svg?style=flat-square)](https://travis-ci.org/sebastienheyd/boilerplate-packager)
+[![StyleCI](https://styleci.io/repos/292614089/shield)](https://styleci.io/repos/292614089)
+[![Scrutinizer](https://scrutinizer-ci.com/g/sebastienheyd/boilerplate-packager/badges/quality-score.png?b=master&style=flat-square)](https://scrutinizer-ci.com/g/sebastienheyd/boilerplate-packager/?branch=master)
+[![License](https://img.shields.io/github/license/sebastienheyd/boilerplate-packager.svg)](license.md)
 
 This package will allow you to easily create and manage your own local packages for [sebastienheyd/boilerplate](https://github.com/sebastienheyd/boilerplate).
 
@@ -118,7 +120,7 @@ MIT license. Please see the [license file](license.md) for more information.
 [ico-version]: https://img.shields.io/packagist/v/sebastienheyd/boilerplate-packager.svg?style=flat-square
 [ico-downloads]: https://img.shields.io/packagist/dt/sebastienheyd/boilerplate-packager.svg?style=flat-square
 [ico-travis]: https://img.shields.io/travis/sebastienheyd/boilerplate-packager/master.svg?style=flat-square
-[ico-styleci]: https://styleci.io/repos/12345678/shield
+[ico-styleci]: https://styleci.io/repos/292614089/shield
 
 [link-packagist]: https://packagist.org/packages/sebastienheyd/boilerplate-packager
 [link-downloads]: https://packagist.org/packages/sebastienheyd/boilerplate-packager
