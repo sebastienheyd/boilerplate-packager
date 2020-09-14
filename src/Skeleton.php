@@ -69,9 +69,8 @@ class Skeleton
         $replacements = [];
         foreach ($this->assign as $k => $v) {
             $replacements['~uc:pl:'.$k] = Str::plural(mb_convert_case(Str::slug($v, ' '), MB_CASE_TITLE));
-            $replacements['~uc:wd:'.$k] = mb_convert_case(Str::slug($v, ' '), MB_CASE_TITLE);
             $replacements['~uc:'.$k] = Str::studly($v);
-            $replacements['~sc:'.$k] = Str::slug($v, '_');
+            $replacements['~sc:'.$k] = mb_strtolower(Str::slug($v, '_'));
             $replacements['~wd:'.$k] = mb_convert_case(Str::slug($v, ' '), MB_CASE_TITLE);
             $replacements['~pl:'.$k] = Str::plural(Str::slug($v, ' '), MB_CASE_TITLE);
             $replacements['~'.$k] = $v;
@@ -102,11 +101,7 @@ class Skeleton
         $rules = json_decode(file_get_contents($this->fileHandler->tempDir('packager.json')));
 
         foreach ($rules as $orig => $dest) {
-            if (! is_readable($this->fileHandler->tempDir($dest))) {
-                rename($this->fileHandler->tempDir($orig), $this->fileHandler->tempDir($dest));
-            } else {
-                $this->fileHandler->removeDir($this->fileHandler->tempDir($orig));
-            }
+            rename($this->fileHandler->tempDir($orig), $this->fileHandler->tempDir($dest));
         }
 
         unlink($this->fileHandler->tempDir('packager.json'));
