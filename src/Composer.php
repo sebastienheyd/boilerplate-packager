@@ -71,6 +71,7 @@ class Composer
     protected function runProcess(array $command)
     {
         $process = new Process($command, base_path());
+        $process->setTimeout(config('packager.timeout', 300));
         $process->run();
 
         if (! $process->isSuccessful()) {

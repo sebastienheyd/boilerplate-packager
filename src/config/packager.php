@@ -8,6 +8,11 @@ return [
     'skeleton_branch' => 'master',
 
     /*
+     * Process timeout, increase if you have problems with long composer processes
+     */
+    'timeout' => 300,
+
+    /*
      * Author and license to suggest when creating a new package.
      */
     'author_name' => '',
