@@ -2,12 +2,7 @@
 
 namespace Sebastienheyd\BoilerplatePackager\Commands;
 
-use Illuminate\Console\Command;
 use Illuminate\Support\Str;
-use Sebastienheyd\BoilerplatePackager\Composer;
-use Sebastienheyd\BoilerplatePackager\FileHandler;
-use Sebastienheyd\BoilerplatePackager\Packagist;
-use Sebastienheyd\BoilerplatePackager\Skeleton;
 
 class CreatePackage extends Command
 {
@@ -26,43 +21,8 @@ class CreatePackage extends Command
     protected $description = '';
 
     /**
-     * @var Packagist
-     */
-    protected $packagist;
-
-    /**
-     * @var FileHandler
-     */
-    protected $fileHandler;
-
-    /**
-     * @var Composer
-     */
-    protected $composer;
-
-    /**
-     * @var Skeleton
-     */
-    protected $skeleton;
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct(Packagist $packagist, FileHandler $fileHandler, Composer $composer, Skeleton $skeleton)
-    {
-        parent::__construct();
-        $this->packagist = $packagist;
-        $this->fileHandler = $fileHandler;
-        $this->composer = $composer;
-        $this->skeleton = $skeleton;
-    }
-
-    /**
-     * Execute the console command.
-     *
      * @return int
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function handle()
     {
@@ -113,24 +73,22 @@ class CreatePackage extends Command
         $this->info('Building package...');
         $this->skeleton->build();
 
-        $src = $this->fileHandler->tempDir();
-        $dest = $this->fileHandler->packagesDir("$vendor/$package");
-        if (is_dir($dest)) {
+        if ($this->storage->exists($vendor.DIRECTORY_SEPARATOR.$package)) {
             if ($this->confirm("<fg=yellow>Package $vendor/$package is already installed, replace package?</>")) {
-                $this->fileHandler->removeDir($dest);
+                $this->storage->deleteDirectory($vendor.DIRECTORY_SEPARATOR.$package);
             } else {
-                $this->fileHandler->removeDir($src);
+                $this->storage->deleteDirectory(self::$temp);
 
                 return 0;
             }
         }
 
-        $this->fileHandler->moveDir($src, $dest);
+        $this->storage->move(self::$temp, $vendor.DIRECTORY_SEPARATOR.$package);
 
         $this->info("Require package $vendor/$package...");
         $this->composer->require("$vendor/$package:@dev", $this->option('dev'));
 
-        if (! is_link(base_path("vendor/$vendor/$package"))) {
+        if (! is_link(base_path('vendor'.DIRECTORY_SEPARATOR.$vendor.DIRECTORY_SEPARATOR.$package))) {
             $this->error('Package installed is not the local version!');
 
             return 1;

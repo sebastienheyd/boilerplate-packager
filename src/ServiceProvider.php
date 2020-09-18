@@ -16,6 +16,13 @@ class ServiceProvider extends BaseServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([__DIR__.'/config' => config_path('boilerplate')], ['config', 'boilerplate']);
 
+            config([
+                'filesystems.disks.packages' => [
+                    'driver' => 'local',
+                    'root' => base_path('packages'),
+                ],
+            ]);
+
             $this->commands([
                 Commands\Packager::class,
             ]);

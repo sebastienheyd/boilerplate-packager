@@ -2,12 +2,6 @@
 
 namespace Sebastienheyd\BoilerplatePackager\Commands;
 
-use Illuminate\Console\Command;
-use Sebastienheyd\BoilerplatePackager\Composer;
-use Sebastienheyd\BoilerplatePackager\FileHandler;
-use Sebastienheyd\BoilerplatePackager\Package;
-use Sebastienheyd\BoilerplatePackager\Packagist;
-
 class RequirePackage extends Command
 {
     /**
@@ -23,40 +17,6 @@ class RequirePackage extends Command
      * @var string
      */
     protected $description = '';
-
-    /**
-     * @var Packagist
-     */
-    protected $packagist;
-
-    /**
-     * @var Package
-     */
-    protected $package;
-
-    /**
-     * @var FileHandler
-     */
-    protected $fileHandler;
-
-    /**
-     * @var Composer
-     */
-    protected $composer;
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct(Packagist $packagist, Package $package, FileHandler $fileHandler, Composer $composer)
-    {
-        parent::__construct();
-        $this->packagist = $packagist;
-        $this->package = $package;
-        $this->fileHandler = $fileHandler;
-        $this->composer = $composer;
-    }
 
     /**
      * Execute the console command.
@@ -100,42 +60,42 @@ class RequirePackage extends Command
             return 1;
         }
 
-        // Clone in temporary folder
+        // Clone
         $this->info('Source URL is '.$url);
         $this->info('Cloning repository...');
-        $tempPath = $this->fileHandler->tempDir("$package->vendor/$package->name");
+        $tempPath = packages_path(self::$temp.DIRECTORY_SEPARATOR.$package->vendor.DIRECTORY_SEPARATOR.$package->name);
         exec("git clone -q $url $tempPath", $output, $exit_code);
 
         // Get information from composer.json
-        if (! is_file($package->temp_path.'/composer.json')) {
+        if (! $this->storage->exists(self::$temp.DIRECTORY_SEPARATOR.$package->vendor.DIRECTORY_SEPARATOR.$package->name.DIRECTORY_SEPARATOR.'composer.json')) {
             $this->error('Package has no composer.json file!');
-            $this->fileHandler->removeDir($this->fileHandler->tempDir());
+            $this->storage->deleteDirectory(self::$temp);
 
             return 1;
         }
 
-        $composer = json_decode(file_get_contents($package->temp_path.'/composer.json'));
+        $composer = json_decode($this->storage->get(self::$temp.DIRECTORY_SEPARATOR.$package->vendor.DIRECTORY_SEPARATOR.$package->name.DIRECTORY_SEPARATOR.'composer.json'));
         [$vendor, $name] = explode('/', $composer->name);
 
         // Move to packages folder with the correct name
         $this->info("Installing package $vendor/$name...");
 
-        if (is_dir($this->fileHandler->packagesDir("$vendor/$name"))) {
+        if ($this->storage->exists($vendor.DIRECTORY_SEPARATOR.$name)) {
             if (! $this->confirm('<fg=yellow>The package already exists in local folder, require current local package?</>')) {
                 if (! $this->confirm('<fg=yellow>Clear local package and install the downloaded one?</>')) {
-                    $this->fileHandler->removeDir($this->fileHandler->tempDir());
+                    $this->storage->deleteDirectory(self::$temp);
 
                     return 0;
                 }
 
-                $this->fileHandler->removeDir($this->fileHandler->packagesDir("$vendor/$name"));
-                $this->fileHandler->moveDir($tempPath, $this->fileHandler->packagesDir("$vendor/$name"));
+                $this->storage->deleteDirectory($vendor.DIRECTORY_SEPARATOR.$name);
+                $this->storage->move(self::$temp.DIRECTORY_SEPARATOR.$package->vendor.DIRECTORY_SEPARATOR.$package->name, $vendor.DIRECTORY_SEPARATOR.$name);
             }
         } else {
-            $this->fileHandler->moveDir($tempPath, $this->fileHandler->packagesDir("$vendor/$name"));
+            $this->storage->move(self::$temp.DIRECTORY_SEPARATOR.$package->vendor.DIRECTORY_SEPARATOR.$package->name, $vendor.DIRECTORY_SEPARATOR.$name);
         }
 
-        $this->fileHandler->removeDir($this->fileHandler->tempDir());
+        $this->storage->deleteDirectory(self::$temp);
 
         $this->info("Require package $vendor/$name...");
         if (! $this->composer->require("$vendor/$name:@dev", $this->option('dev'))) {

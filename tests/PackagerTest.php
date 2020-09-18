@@ -2,6 +2,8 @@
 
 namespace Sebastienheyd\BoilerplatePackager\Tests;
 
+use Illuminate\Support\Facades\Artisan;
+
 class PackagerTest extends TestCase
 {
     public function testNoAction()

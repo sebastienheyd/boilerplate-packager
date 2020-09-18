@@ -20,7 +20,7 @@ class Package
 
         foreach ($regex as $rx) {
             if (preg_match($rx, $url, $m)) {
-                $this->url = $this->origin;
+                $this->url = $url;
                 $this->vendor = $m[2];
                 $this->name = $m[3];
 
@@ -29,14 +29,5 @@ class Package
         }
 
         return false;
-    }
-
-    public function __get($name)
-    {
-        if ($name === 'temp_path') {
-            return base_path('packages/.temp').'/'.$this->vendor.'/'.$this->name;
-        }
-
-        return null;
     }
 }

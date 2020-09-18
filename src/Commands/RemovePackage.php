@@ -2,11 +2,6 @@
 
 namespace Sebastienheyd\BoilerplatePackager\Commands;
 
-use Illuminate\Console\Command;
-use Sebastienheyd\BoilerplatePackager\Composer;
-use Sebastienheyd\BoilerplatePackager\FileHandler;
-use Sebastienheyd\BoilerplatePackager\Packagist;
-
 class RemovePackage extends Command
 {
     /**
@@ -24,39 +19,6 @@ class RemovePackage extends Command
     protected $description = '';
 
     /**
-     * @var Packagist
-     */
-    protected $packagist;
-
-    /**
-     * @var Package
-     */
-    protected $package;
-
-    /**
-     * @var FileHandler
-     */
-    protected $fileHandler;
-
-    /**
-     * @var Composer
-     */
-    protected $composer;
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct(Packagist $packagist, FileHandler $fileHandler, Composer $composer)
-    {
-        parent::__construct();
-        $this->packagist = $packagist;
-        $this->fileHandler = $fileHandler;
-        $this->composer = $composer;
-    }
-
-    /**
      * Execute the console command.
      *
      * @return int
@@ -67,14 +29,9 @@ class RemovePackage extends Command
 
         if (! $package) {
             $choices = [];
-            $path = $this->fileHandler->packagesDir();
-            foreach (array_diff(scandir($path), ['.', '..']) as $vendor) {
-                if (! is_dir("$path/$vendor")) {
-                    continue;
-                }
-
-                foreach (array_diff(scandir("$path/$vendor"), ['.', '..']) as $name) {
-                    $choices[] = "$vendor/$name";
+            foreach ($this->storage->directories() as $vendor) {
+                foreach ($this->storage->directories($vendor) as $package) {
+                    $choices[] = $package;
                 }
             }
             $package = $this->choice('Which package do you want to remove?', $choices);
@@ -93,7 +50,7 @@ class RemovePackage extends Command
             return 1;
         }
 
-        if (! is_dir($this->fileHandler->packagesDir($package))) {
+        if (! $this->storage->exists($package)) {
             $this->error("The package $package is not a local package, you have to remove it manually!");
 
             return 1;
@@ -116,7 +73,7 @@ class RemovePackage extends Command
         }
 
         if ($this->confirm("<fg=yellow>Removing folder packages/$package?</>")) {
-            $this->fileHandler->removeDir($this->fileHandler->packagesDir($package));
+            $this->storage->deleteDirectory($package);
         }
 
         $this->info('Package removed successfully!');

@@ -8,15 +8,8 @@ use Symfony\Component\Process\Process;
 
 class Composer
 {
-    /**
-     * @var FileHandler
-     */
-    protected $fileHandler;
-
-    public function __construct(FileHandler $fileHandler)
+    public function __construct()
     {
-        $this->fileHandler = $fileHandler;
-
         foreach (json_decode(file_get_contents(base_path('composer.json'))) as $k => $v) {
             $this->{$k} = $v;
         }

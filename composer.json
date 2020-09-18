@@ -24,6 +24,9 @@
         "squizlabs/php_codesniffer": "^3.5"
     },
     "autoload": {
+        "files": [
+            "src/helpers.php"
+        ],
         "psr-4": {
             "Sebastienheyd\\BoilerplatePackager\\": "src/"
         }

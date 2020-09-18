@@ -3,7 +3,7 @@
 namespace Sebastienheyd\BoilerplatePackager\Commands;
 
 use Illuminate\Console\Command;
-use Sebastienheyd\BoilerplatePackager\FileHandler;
+use Illuminate\Support\Facades\Storage;
 
 class Packager extends Command
 {
@@ -25,27 +25,29 @@ class Packager extends Command
     protected $description = 'Manage packages for sebastienheyd/boilerplate';
 
     /**
-     * @var FileHandler
+     * @var \Illuminate\Support\Facades\Storage
      */
-    protected $fileHandler;
+    protected $storage;
+
+    /**
+     * Temporary folder name
+     *
+     * @var string
+     */
+    protected static $temp = '.temp';
 
     /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct(FileHandler $fileHandler)
+    public function __construct()
     {
         parent::__construct();
 
-        if (! is_dir($fileHandler->packagesDir())) {
-            mkdir($fileHandler->packagesDir(), 0775, true);
-            file_put_contents($fileHandler->packagesDir('.gitignore'), '.temp/');
-        }
-
-        if (is_dir($fileHandler->tempDir())) {
-            $fileHandler->removeDir($fileHandler->tempDir());
-        }
+        $this->storage = Storage::disk('packages');
+        $this->storage->put('.gitignore', self::$temp.DIRECTORY_SEPARATOR);
+        $this->storage->deleteDirectory(self::$temp);
     }
 
     /**

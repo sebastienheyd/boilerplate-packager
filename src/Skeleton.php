@@ -2,20 +2,31 @@
 
 namespace Sebastienheyd\BoilerplatePackager;
 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Skeleton
 {
+    /**
+     * @var array
+     */
     public $assign = [];
 
     /**
-     * @var FileHandler
+     * @var \Illuminate\Support\Facades\Storage
      */
-    protected $fileHandler;
+    protected $storage;
 
-    public function __construct(FileHandler $fileHandler)
+    /**
+     * Temporary folder name
+     *
+     * @var string
+     */
+    protected static $temp = '.temp';
+
+    public function __construct()
     {
-        $this->fileHandler = $fileHandler;
+        $this->storage = Storage::disk('packages');
     }
 
     public function assign($name, $value = null)
@@ -33,37 +44,56 @@ class Skeleton
         return $this;
     }
 
+    /**
+     * Copy or download the skeleton content and put it in packages temporary folder.
+     *
+     * @param string $url
+     * @param string $branch
+     * @return bool
+     */
     public function download($url, $branch)
     {
         if (is_dir($url)) {
-            $this->recurse_copy($url, $this->fileHandler->tempDir());
+            $this->recurse_copy($url, packages_path(self::$temp));
 
             return true;
         }
 
-        $tempPath = $this->fileHandler->tempDir();
+        $tempPath = packages_path(self::$temp);
         exec("git clone -b $branch -q $url $tempPath", $output, $exit_code);
-        $this->fileHandler->removeDir($tempPath.'/.git');
+        $this->storage->deleteDirectory(self::$temp.DIRECTORY_SEPARATOR.'.git');
 
         return true;
     }
 
+    /**
+     * Recursive copy of skeleton files.
+     * This will not use Storage facade because skeleton folder can be outside of the packages directory.
+     *
+     * @param string $src
+     * @param string $dst
+     */
     private function recurse_copy($src, $dst)
     {
         $dir = opendir($src);
         @mkdir($dst);
         while (false !== ($file = readdir($dir))) {
             if (($file != '.') && ($file != '..')) {
-                if (is_dir($src.'/'.$file)) {
-                    $this->recurse_copy($src.'/'.$file, $dst.'/'.$file);
+                if (is_dir($src.DIRECTORY_SEPARATOR.$file)) {
+                    $this->recurse_copy($src.DIRECTORY_SEPARATOR.$file, $dst.DIRECTORY_SEPARATOR.$file);
                 } else {
-                    copy($src.'/'.$file, $dst.'/'.$file);
+                    copy($src.DIRECTORY_SEPARATOR.$file, $dst.DIRECTORY_SEPARATOR.$file);
                 }
             }
         }
         closedir($dir);
     }
 
+    /**
+     * Replace content in skeleton files, rename files and build license
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
     public function build()
     {
         $replacements = [];
@@ -76,40 +106,51 @@ class Skeleton
             $replacements['~'.$k] = $v;
         }
 
-        $iterator = (new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->fileHandler->tempDir())));
-        foreach ($iterator as $item) {
-            /** @var \SplFileInfo $item */
-            if (! $item->isFile()) {
-                continue;
-            }
-
-            $content = file_get_contents($item->getPathname());
+        foreach ($this->storage->allFiles(self::$temp) as $file) {
+            $content = $this->storage->get($file);
             $content = str_replace(array_keys($replacements), array_values($replacements), $content);
-            file_put_contents($item->getPathname(), $content);
+            $this->storage->put($file, $content);
         }
 
         $this->moveFiles();
         $this->buildLicense();
     }
 
+    /**
+     * Rename files that are declared in packager.json
+     *
+     * @return false
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
     private function moveFiles()
     {
-        if (! is_file($this->fileHandler->tempDir('packager.json'))) {
+        $packagerJson = self::$temp.DIRECTORY_SEPARATOR.'packager.json';
+
+        if (! $this->storage->exists($packagerJson)) {
             return false;
         }
 
-        $rules = json_decode(file_get_contents($this->fileHandler->tempDir('packager.json')));
+        $rules = json_decode($this->storage->get($packagerJson));
 
         foreach ($rules as $orig => $dest) {
-            rename($this->fileHandler->tempDir($orig), $this->fileHandler->tempDir($dest));
+            if ($this->storage->exists(self::$temp.DIRECTORY_SEPARATOR.$dest)) {
+                $this->storage->delete(self::$temp.DIRECTORY_SEPARATOR.$dest);
+            }
+            $this->storage->move(self::$temp.DIRECTORY_SEPARATOR.$orig, self::$temp.DIRECTORY_SEPARATOR.$dest);
         }
 
-        unlink($this->fileHandler->tempDir('packager.json'));
+        $this->storage->delete($packagerJson);
     }
 
+    /**
+     * Get and build license file
+     *
+     * @return false
+     */
     private function buildLicense()
     {
-        if (! is_file($this->fileHandler->tempDir('license.md'))) {
+        $licenseFile = self::$temp.DIRECTORY_SEPARATOR.'license.md';
+        if (! $this->storage->exists($licenseFile)) {
             return false;
         }
 
@@ -128,6 +169,6 @@ class Skeleton
         ];
 
         $content = str_replace(array_keys($replace), array_values($replace), $license);
-        file_put_contents($this->fileHandler->tempDir('license.md'), $content);
+        $this->storage->put($licenseFile, $content);
     }
 }
