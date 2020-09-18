@@ -37,7 +37,7 @@ class Command extends BaseCommand
     protected $storage;
 
     /**
-     * Temporary folder name
+     * Temporary folder name.
      *
      * @var string
      */

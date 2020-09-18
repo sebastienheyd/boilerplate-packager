@@ -30,7 +30,7 @@ class Packager extends Command
     protected $storage;
 
     /**
-     * Temporary folder name
+     * Temporary folder name.
      *
      * @var string
      */

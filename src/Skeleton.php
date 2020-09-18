@@ -18,7 +18,7 @@ class Skeleton
     protected $storage;
 
     /**
-     * Temporary folder name
+     * Temporary folder name.
      *
      * @var string
      */
@@ -90,7 +90,7 @@ class Skeleton
     }
 
     /**
-     * Replace content in skeleton files, rename files and build license
+     * Replace content in skeleton files, rename files and build license.
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
@@ -117,7 +117,7 @@ class Skeleton
     }
 
     /**
-     * Rename files that are declared in packager.json
+     * Rename files that are declared in packager.json.
      *
      * @return false
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
@@ -143,7 +143,7 @@ class Skeleton
     }
 
     /**
-     * Get and build license file
+     * Get and build license file.
      *
      * @return false
      */
