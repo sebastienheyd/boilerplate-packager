@@ -60,7 +60,7 @@ class Skeleton
         }
 
         $tempPath = packages_path(self::$temp);
-        exec("git clone -b $branch -q $url $tempPath", $output, $exit_code);
+        run_process(['git', 'clone', '-b', $branch, '-q', $url, $tempPath]);
         $this->storage->deleteDirectory(self::$temp.DIRECTORY_SEPARATOR.'.git');
 
         return true;

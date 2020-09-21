@@ -3,8 +3,6 @@
 namespace Sebastienheyd\BoilerplatePackager;
 
 use RuntimeException;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Process;
 
 class Composer
 {
@@ -44,8 +42,8 @@ class Composer
             $options[] = '--dev';
         }
 
-        if ($this->runProcess($options)) {
-            return $this->runProcess(['composer', 'update', $package]);
+        if (run_process($options)) {
+            return run_process(['composer', 'update', $package]);
         }
 
         return false;
@@ -56,22 +54,6 @@ class Composer
         if (! preg_match('`^([A-Za-z0-9\-]*)/([A-Za-z0-9\-]*)(:[@a-z\-]*)?$`', $package, $m)) {
             throw new RuntimeException('Package name is not well formatted');
         }
-    }
-
-    /**
-     * @return bool
-     */
-    protected function runProcess(array $command)
-    {
-        $process = new Process($command, base_path());
-        $process->setTimeout(config('packager.timeout', 300));
-        $process->run();
-
-        if (! $process->isSuccessful()) {
-            throw new ProcessFailedException($process);
-        }
-
-        return $process->getExitCode() === 0;
     }
 
     public function require($package, $dev = false)
@@ -85,7 +67,7 @@ class Composer
                 $args[] = '--dev';
             }
 
-            return $this->runProcess($args);
+            return run_process($args);
         }
 
         return false;
@@ -114,6 +96,6 @@ class Composer
             'composer.json',
         ];
 
-        return $this->runProcess($command);
+        return run_process($command);
     }
 }
