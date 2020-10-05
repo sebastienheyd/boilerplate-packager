@@ -64,7 +64,7 @@ class RequirePackage extends Command
         $this->info('Source URL is '.$url);
         $this->info('Cloning repository...');
         $tempPath = packages_path(self::$temp.DIRECTORY_SEPARATOR.$package->vendor.DIRECTORY_SEPARATOR.$package->name);
-        exec("git clone -q $url $tempPath", $output, $exit_code);
+        run_process(['git', 'clone', '-q', $url, $tempPath]);
 
         // Get information from composer.json
         if (! $this->storage->exists(self::$temp.DIRECTORY_SEPARATOR.$package->vendor.DIRECTORY_SEPARATOR.$package->name.DIRECTORY_SEPARATOR.'composer.json')) {

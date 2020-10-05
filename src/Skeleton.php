@@ -61,7 +61,12 @@ class Skeleton
 
         $tempPath = packages_path(self::$temp);
         run_process(['git', 'clone', '-b', $branch, '-q', $url, $tempPath]);
-        $this->storage->deleteDirectory(self::$temp.DIRECTORY_SEPARATOR.'.git');
+
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            exec('rmdir /Q /S '.$tempPath.DIRECTORY_SEPARATOR.'.git');
+        } else {
+            $this->storage->deleteDirectory(self::$temp.DIRECTORY_SEPARATOR.'.git');
+        }
 
         return true;
     }
