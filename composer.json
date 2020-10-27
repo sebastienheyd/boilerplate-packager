@@ -13,7 +13,7 @@
     "require": {
         "ext-curl": "*",
         "ext-json": "*",
-        "illuminate/support": "^6.0|^7.0",
+        "illuminate/support": "^6.0|^7.0|^8.0",
         "guzzlehttp/guzzle": "^6.0|^7.0"
     },
     "require-dev": {
