@@ -2,7 +2,7 @@
 
 Contributions are welcome and will be fully credited.
 
-Contributions are accepted via Pull Requests on [Github](https://github.com/~vendor/~package).
+Contributions are accepted via Pull Requests on [Github](https://github.com/sebastienheyd/boilerplate-packager).
 
 ## Things you could do
    
