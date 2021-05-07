@@ -14,7 +14,7 @@ class ServiceProvider extends BaseServiceProvider
     public function boot()
     {
         if ($this->app->runningInConsole()) {
-            $this->publishes([__DIR__.'/config' => config_path('boilerplate')], ['config', 'boilerplate']);
+            $this->publishes([__DIR__.'/config' => config_path('boilerplate')], ['boilerplate', 'boilerplate-packager']);
 
             config([
                 'filesystems.disks.packages' => [

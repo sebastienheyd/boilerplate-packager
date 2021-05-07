@@ -20,7 +20,7 @@ composer require sebastienheyd/boilerplate-packager --dev
 **Optionnal**: publish configuration file
 
 ```bash
-php artisan vendor:publish --provider="Sebastienheyd\BoilerplatePackager\ServiceProvider"
+php artisan vendor:publish --tag=boilerplate-packager
 ```
 
 ## Usage
