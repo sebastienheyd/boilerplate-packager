@@ -31,7 +31,7 @@ trait TestHelper
             $composer['require-dev'] = new \StdClass();
 
             // Install stable version
-            $composer['minimum-stability'] = 'stable';
+            $composer['minimum-stability'] = 'dev';
             $composer['prefer-stable'] = true;
             $files->put(self::TEST_APP_TEMPLATE.'/composer.json', json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 

@@ -57,6 +57,17 @@ class Packager extends Command
      */
     public function handle()
     {
+        $this->info("
+  ____        _ _                 _       _
+ |  _ \      (_) |               | |     | |
+ | |_) | ___  _| | ___ _ __ _ __ | | __ _| |_ ___
+ |  _ < / _ \| | |/ _ \ '__| '_ \| |/ _` | __/ _ \
+ | |_) | (_) | | |  __/ |  | |_) | | (_| | ||  __/
+ |____/ \___/|_|_|\___|_|  | .__/|_|\__,_|\__\___/
+                           | |
+                           |_|
+");
+
         $action = $this->argument('action');
 
         if (! in_array($action, ['create', 'require', 'remove', 'list'])) {
