@@ -11,6 +11,7 @@
     "homepage": "https://github.com/sebastienheyd/boilerplate-packager",
     "keywords": ["laravel","boilerplate","packager"],
     "require": {
+        "php": ">=7.2.5",
         "ext-curl": "*",
         "ext-json": "*",
         "illuminate/support": "^6.0|^7.0|^8.0",
