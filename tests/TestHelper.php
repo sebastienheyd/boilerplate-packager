@@ -27,7 +27,7 @@ trait TestHelper
             unset($composer['autoload']['classmap'][1]);
 
             // Pre-install illuminate/support
-            $composer['require'] = ['illuminate/support' => '~7'];
+            $composer['require'] = ['illuminate/support' => '^7.0|^8.0'];
             $composer['require-dev'] = new \StdClass();
 
             // Install stable version
