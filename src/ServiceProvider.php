@@ -13,20 +13,24 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function boot()
     {
-        if ($this->app->runningInConsole()) {
-            $this->publishes([__DIR__.'/config' => config_path('boilerplate')], ['boilerplate', 'boilerplate-packager']);
-
-            config([
-                'filesystems.disks.packages' => [
-                    'driver' => 'local',
-                    'root' => base_path('packages'),
-                ],
-            ]);
-
-            $this->commands([
-                Commands\Packager::class,
-            ]);
+        if (! $this->app->runningInConsole()) {
+            return;
         }
+
+        $this->publishes([__DIR__.'/config' => config_path('boilerplate')], ['boilerplate', 'boilerplate-packager']);
+
+        config([
+            'filesystems.disks.packages' => [
+                'driver' => 'local',
+                'root' => base_path('packages'),
+            ],
+        ]);
+
+        $this->commands([
+            Commands\Packager::class,
+        ]);
+
+        $this->loadViewsFrom(__DIR__.'/resources/views', 'packager');
     }
 
     /**

@@ -70,7 +70,7 @@ class Packager extends Command
 
         $action = $this->argument('action');
 
-        if (! in_array($action, ['create', 'require', 'remove', 'list'])) {
+        if (! in_array($action, ['create', 'require', 'remove', 'list', 'crud'])) {
             $this->help();
 
             return 0;
