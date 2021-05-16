@@ -28,6 +28,10 @@ class CrudPackage extends Command
     {
         $package = Str::lower($this->argument('package'));
 
+//            if (! $this->confirm('Confirm?')) {
+//                return 0;
+//            }
+
         if (!$this->packagist->checkFormat($package)) {
             $this->error('Package name format must be vendor/package');
 
@@ -48,15 +52,17 @@ class CrudPackage extends Command
             return 1;
         }
 
-        foreach ($tables as $table) {
-            $this->callCommand('model', $table, $package);
-        }
+        $args = ['tables' => $tables, 'package' => $package];
+        $this->callCommand('model', $args);
+        //$this->callCommand('routes', $args);
+        $this->callCommand('lang', $args);
+        $this->callCommand('permissions', $args);
     }
 
-    private function callCommand($action, $table, $package)
+    private function callCommand($action, $args)
     {
         $this->getApplication()->addCommands([$this->resolveCommand(__NAMESPACE__.'\\Crud\\'.ucfirst($action))]);
-        $this->call('boilerplate:packager:crud:'.$action, ['table' => $table, 'package' => $package]);
+        $this->call('boilerplate:packager:crud:'.$action, $args);
     }
 
     private function getPackageTables($package)

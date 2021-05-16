@@ -6,23 +6,20 @@ use Illuminate\Support\Str;
 
 class Model extends Command
 {
-    protected $signature = 'boilerplate:packager:crud:model {package} {table}';
+    protected $signature = 'boilerplate:packager:crud:model {package} {tables}';
     protected $description = '';
 
     public function handle()
     {
-        $table = $this->argument('table');
+        foreach ($this->argument('tables') as $table) {
+            $this->buildModel($table);
+        }
+    }
 
+    private function buildModel($table)
+    {
         $package = $this->argument('package');
         $className = Str::studly(Str::singular($table));
-        $path = $package.'/src/Models/'.$className.'.php';
-
-        if($this->storage->exists($path)) {
-//            if (! $this->confirm($className.' model already exists, overwrite?')) {
-//                return 0;
-//            }
-        }
-
         $columns = $this->getColumnsFromTable($table);
 
         $model = (string) view('packager::model', [
@@ -54,6 +51,6 @@ class Model extends Command
         ]);
 
         $this->info("Writing $className model");
-        $this->storage->put($path, $model);
+        $this->storage->put($package.'/src/Models/'.$className.'.php', $model);
     }
 }

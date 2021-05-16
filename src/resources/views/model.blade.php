@@ -1,6 +1,4 @@
-@php echo "<?php"
-@endphp
-
+{!! '<?php' !!}
 
 namespace {{ $namespace }};
 

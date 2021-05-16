@@ -58,7 +58,9 @@ class CreatePackage extends Command
             'license' => $this->forceAnswer('License', config('boilerplate.packager.license')),
             'vendor' => $vendor,
             'package' => $package,
-            'date' => date('Y_m_d_His'),
+            'date1' => date('Y_m_d_Hi00'),
+            'date2' => date('Y_m_d_Hi01'),
+            'date3' => date('Y_m_d_Hi02'),
             'locale' => config('boilerplate.app.locale'),
         ]);
 
