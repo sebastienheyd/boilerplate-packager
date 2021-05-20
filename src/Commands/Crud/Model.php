@@ -27,9 +27,6 @@ class Model extends Command
             'className'     => $className,
             'table'         => $table,
             'fillable'      => $columns->filter(function ($column) {
-                if(preg_match('#_id$#', $column['name'])) {
-                    return false;
-                }
                 return !in_array($column['name'], ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token']);
             })->pluck('name')->join("','"),
             'dates'         => $columns->filter(function ($column) {

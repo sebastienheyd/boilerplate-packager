@@ -2,6 +2,7 @@
 
 namespace Sebastienheyd\BoilerplatePackager\Commands\Crud;
 
+use Doctrine\DBAL\Types\StringType;
 use Illuminate\Console\Command as BaseCommand;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -32,18 +33,13 @@ class Command extends BaseCommand
                 return in_array($column, $index->getColumns()) && ($index->isUnique() && !$index->isPrimary());
             });
 
-            $deletedAt = $uniqueIndex->filter(function ($index) {
-                return $index->hasOption('where') && $index->getOption('where') == '(deleted_at IS NULL)';
-            });
-
             $required = boolval(Schema::getConnection()->getDoctrineColumn($table, $column)->getNotnull());
 
             return [
-                'name'                        => $column,
-                'type'                        => Schema::getColumnType($table, $column),
-                'required'                    => $required,
-                'unique'                      => $uniqueIndex->count() > 0,
-                'unique_deleted_at_condition' => $deletedAt->count() > 0,
+                'name'        => $column,
+                'type'        => Schema::getColumnType($table, $column),
+                'required'    => $required,
+                'unique'      => $uniqueIndex->count() > 0,
             ];
         });
     }
@@ -56,6 +52,7 @@ class Command extends BaseCommand
 
         /** @var \Doctrine\DBAL\Schema\Table $table */
         foreach ($tables as $table) {
+
             if (preg_match('#^([a-z]+)_([a-z]+)$#', $table->getName())) {
                 $return = false;
                 $foreignTable = [];
@@ -67,6 +64,9 @@ class Command extends BaseCommand
                         $foreignTable = [
                             'method' => $fk->getForeignTableName(),
                             'model' => $this->getClassFromRelationTable($fk->getForeignTableName()),
+                            'labelField' => $this->getTableLabelField($fk->getForeignTableName()),
+                            'idField' => $this->getTableIdField($fk->getForeignTableName()),
+                            'required' => false,
                         ];
                     }
                 }
@@ -82,13 +82,22 @@ class Command extends BaseCommand
                     $relations['hasMany'][] = [
                         'method' => $fk->getLocalTableName(),
                         'model' => $this->getClassFromRelationTable($fk->getLocalTableName()),
+                        'labelField' => $this->getTableLabelField($fk->getLocalTableName()),
+                        'idField' => $this->getTableIdField($fk->getLocalTableName()),
+                        'required' => false,
                     ];
                 }
 
                 if($table->getName() === $tableName) {
+
+                    $req = Schema::getConnection()->getDoctrineColumn($tableName, $fk->getColumns()[0])->getNotnull();
+
                     $relations['belongsTo'][] = [
                         'method' => $fk->getForeignTableName(),
                         'model' => $this->getClassFromRelationTable($fk->getForeignTableName()),
+                        'labelField' => $this->getTableLabelField($fk->getForeignTableName()),
+                        'idField' => $this->getTableIdField($fk->getForeignTableName()),
+                        'required' => boolval($req),
                     ];
                 }
             }
@@ -97,6 +106,54 @@ class Command extends BaseCommand
         return $relations;
     }
 
+    private function getTableIdField($table)
+    {
+        $columns = Schema::getConnection()->getDoctrineSchemaManager()->listTableColumns($table);
+
+        foreach ($columns as $column) {
+            if($column->getAutoincrement()) {
+                return $column->getName();
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get the first label field from table structure.
+     *
+     * @param string $table
+     *
+     * @return false|string
+     */
+    private function getTableLabelField($table)
+    {
+        $columns = Schema::getColumnListing($table);
+
+        foreach (['label', 'title', 'name', 'first_name'] as $field) {
+            if (in_array($field, $columns)) {
+                return $field;
+            }
+        }
+
+        $columns = Schema::getConnection()->getDoctrineSchemaManager()->listTableColumns($table);
+
+        foreach ($columns as $column) {
+            if(get_class($column->getType()) === StringType::class) {
+                return $column->getName();
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get model class name from table name.
+     *
+     * @param string $table
+     *
+     * @return string
+     */
     private function getClassFromRelationTable($table)
     {
         return Str::studly(Str::singular($table));

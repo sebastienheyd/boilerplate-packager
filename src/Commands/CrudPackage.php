@@ -54,9 +54,12 @@ class CrudPackage extends Command
 
         $args = ['tables' => $tables, 'package' => $package];
         $this->callCommand('model', $args);
-        //$this->callCommand('routes', $args);
+        $this->callCommand('routes', $args);
         $this->callCommand('lang', $args);
         $this->callCommand('permissions', $args);
+        $this->callCommand('controller', $args);
+        $this->callCommand('menu', $args);
+        $this->callCommand('views', $args);
     }
 
     private function callCommand($action, $args)

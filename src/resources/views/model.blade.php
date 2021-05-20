@@ -33,9 +33,9 @@ class {{ $className }} extends Model
 @foreach($relations['belongsTo'] as $relation)
 
     /**
-     * {{ '@' }}return BelongsTo
+     * @return BelongsTo
      */
-    public function {{ $relation['method'] }}(): BelongsTo
+    public function {{ Str::singular($relation['method']) }}(): BelongsTo
     {
         return $this->belongsTo({{ $relation['model'] }}::class);
     }
@@ -45,7 +45,7 @@ class {{ $className }} extends Model
 @foreach($relations['belongsToMany'] as $relation)
 
     /**
-     * {{ '@' }}return BelongsToMany
+     * @return BelongsToMany
      */
     public function {{ $relation['method'] }}(): BelongsToMany
     {
@@ -57,7 +57,7 @@ class {{ $className }} extends Model
 @foreach($relations['hasMany'] as $relation)
 
     /**
-     * {{ '@' }}return HasMany
+     * @return HasMany
      */
     public function {{ $relation['method'] }}(): HasMany
     {

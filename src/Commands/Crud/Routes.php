@@ -12,11 +12,19 @@ class Routes extends Command
         $package = $this->argument('package');
         [$vendor, $packageName] = explode('/', $package);
 
+        $relations = [];
+        foreach ($this->argument('tables') as $table) {
+            $relations[$table] = $this->getTableRelations($table);
+        }
+
+//        dd($relations);
+
         $routes = (string) view('packager::routes', [
             'models' => $this->argument('tables'),
             'namespace' => $this->getNamespace($this->argument('package')),
             'vendor' => $vendor,
-            'package' => $packageName
+            'package' => $packageName,
+            'relations' => $relations,
         ]);
 
         $this->info("Writing routes");

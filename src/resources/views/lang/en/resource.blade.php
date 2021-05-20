@@ -16,9 +16,13 @@ return [
 @foreach($fields[$resource] as $field)
             '{{ $field }}' => '{{ ucfirst(str_replace(['_id', '_'], ['', ' '], $field)) }}',
 @endforeach
-@foreach($relations[$resource] as $relation)
-@foreach($relation as $type => $value)
+@foreach($relations[$resource] as $type => $rels)
+@foreach($rels as $value)
+@if(in_array($type, ['hasMany', 'belongsToMany']))
             '{{ $value['method'] }}' => '{{ ucfirst($value['method']) }}',
+@else
+            '{{ Str::singular($value['method']) }}' => '{{ ucfirst(Str::singular($value['method'])) }}',
+@endif
 @endforeach
 @endforeach
         ],
