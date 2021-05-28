@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 
 class Model extends Command
 {
-    protected $signature = 'boilerplate:packager:crud:model {package} {tables}';
+    protected $signature = 'boilerplate:packager:crud:model {package} {tables} {namespaces?}';
     protected $description = '';
 
     public function handle()
@@ -24,6 +24,7 @@ class Model extends Command
 
         $model = (string) view('packager::model', [
             'namespace'     => $this->getNamespace($package).'\Models',
+            'namespaces'    => $this->argument('namespaces'),
             'className'     => $className,
             'table'         => $table,
             'fillable'      => $columns->filter(function ($column) {
@@ -40,10 +41,10 @@ class Model extends Command
             })->pluck('name')->join("','"),
             'timestamps'    => $columns->filter(function ($column) {
                     return in_array($column['name'], ['created_at', 'updated_at']);
-                })->count() > 0,
+            })->count() > 0,
             'hasSoftDelete' => $columns->filter(function ($column) {
                     return $column['name'] == "deleted_at";
-                })->count() > 0,
+            })->count() > 0,
             'relations' => $this->getTableRelations($table),
         ]);
 

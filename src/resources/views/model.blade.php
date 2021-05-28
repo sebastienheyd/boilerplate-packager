@@ -3,6 +3,14 @@
 namespace {{ $namespace }};
 
 use Illuminate\Database\Eloquent\Model;
+@if (count($relations ?? []))
+@foreach($relations as $type => $rels)
+@foreach($rels as $rel)
+@if(isset($namespaces[$rel['method']]))use {{ $namespaces[$rel['method']] }}\{{ $rel['model'] }};
+@endif
+@endforeach
+@endforeach
+@endif
 @if (count($relations['belongsTo'] ?? []))use Illuminate\Database\Eloquent\Relations\BelongsTo;
 @endif
 @if (count($relations['belongsToMany'] ?? []))use Illuminate\Database\Eloquent\Relations\BelongsToMany;

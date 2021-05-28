@@ -30,7 +30,7 @@ class Views extends Command
                 continue;
             }
 
-            if(preg_match('#_id$#', $column['name'])) {
+            if (preg_match('#_id$#', $column['name'])) {
                 continue;
             }
 

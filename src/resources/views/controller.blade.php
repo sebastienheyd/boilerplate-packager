@@ -15,11 +15,15 @@ use Illuminate\View\View;
 use Throwable;
 use Yajra\DataTables\DataTables;
 use {{ $namespace }}\Models\{{ Str::studly(Str::singular($resource)) }};
+@if (count($relations ?? []))
 @foreach($relations as $type => $rels)
-@foreach($rels as $relation)
-use {{ $namespace }}\Models\{{ $relation['model'] }};
+@foreach($rels as $rel)
+@if(isset($namespaces[$rel['method']]))use {{ $namespaces[$rel['method']] }}\{{ $rel['model'] }};
+@else()use {{ $namespace }}\Models\{{ $rel['model'] }};
+@endif
 @endforeach
 @endforeach
+@endif
 
 class {{ Str::studly(Str::singular($resource)) }}Controller extends Controller
 {

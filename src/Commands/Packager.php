@@ -101,6 +101,7 @@ class Packager extends Command
         $this->line('  <fg=green>boilerplate:package create <package> [--dev]</>               Create a new local package.');
         $this->line('  <fg=green>boilerplate:package require <package|repository> [--dev]</>   Install an existing package.');
         $this->line('  <fg=green>boilerplate:package remove <package></>                       Remove a locally installed package.');
+        $this->line('  <fg=green>boilerplate:package crud <package></>                         Create the files for crud from package tables.');
         $this->line('');
         $this->warn('Arguments');
         $this->line('  <fg=green>package</>     Package name in vendor/package format');

@@ -52,7 +52,6 @@ class Command extends BaseCommand
 
         /** @var \Doctrine\DBAL\Schema\Table $table */
         foreach ($tables as $table) {
-
             if (preg_match('#^([a-z]+)_([a-z]+)$#', $table->getName())) {
                 $return = false;
                 $foreignTable = [];
@@ -78,7 +77,7 @@ class Command extends BaseCommand
             }
 
             foreach ($table->getForeignKeys() as $fk) {
-                if($fk->getForeignTableName() === $tableName) {
+                if ($fk->getForeignTableName() === $tableName) {
                     $relations['hasMany'][] = [
                         'method' => $fk->getLocalTableName(),
                         'model' => $this->getClassFromRelationTable($fk->getLocalTableName()),
@@ -88,8 +87,7 @@ class Command extends BaseCommand
                     ];
                 }
 
-                if($table->getName() === $tableName) {
-
+                if ($table->getName() === $tableName) {
                     $req = Schema::getConnection()->getDoctrineColumn($tableName, $fk->getColumns()[0])->getNotnull();
 
                     $relations['belongsTo'][] = [
@@ -111,7 +109,7 @@ class Command extends BaseCommand
         $columns = Schema::getConnection()->getDoctrineSchemaManager()->listTableColumns($table);
 
         foreach ($columns as $column) {
-            if($column->getAutoincrement()) {
+            if ($column->getAutoincrement()) {
                 return $column->getName();
             }
         }
@@ -139,7 +137,7 @@ class Command extends BaseCommand
         $columns = Schema::getConnection()->getDoctrineSchemaManager()->listTableColumns($table);
 
         foreach ($columns as $column) {
-            if(get_class($column->getType()) === StringType::class) {
+            if (get_class($column->getType()) === StringType::class) {
                 return $column->getName();
             }
         }

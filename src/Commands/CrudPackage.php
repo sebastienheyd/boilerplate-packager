@@ -2,6 +2,7 @@
 
 namespace Sebastienheyd\BoilerplatePackager\Commands;
 
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class CrudPackage extends Command
@@ -11,7 +12,7 @@ class CrudPackage extends Command
      *
      * @var string
      */
-    protected $signature = 'boilerplate:packager:crud {package}';
+    protected $signature = 'boilerplate:packager:crud {package : package name where to scaffold}';
 
     /**
      * The console command description.
@@ -27,11 +28,6 @@ class CrudPackage extends Command
     public function handle()
     {
         $package = Str::lower($this->argument('package'));
-
-//            if (! $this->confirm('Confirm?')) {
-//                return 0;
-//            }
-
         if (!$this->packagist->checkFormat($package)) {
             $this->error('Package name format must be vendor/package');
 
@@ -52,12 +48,32 @@ class CrudPackage extends Command
             return 1;
         }
 
+        foreach ($tables as $table) {
+            foreach (Schema::getConnection()->getDoctrineSchemaManager()->listTableForeignKeys($table) as $fk) {
+                if (in_array($fk->getForeignTableName(), $tables)) {
+                    continue;
+                }
+
+                $model = Str::studly(Str::singular($fk->getForeignTableName()));
+                $namespaces[$fk->getForeignTableName()] = $this->checkModel($model);
+            }
+        }
+
+        $warn = '  Warning ! This command will overwrite all files in the package '.$package.'  ';
+        $this->warn(str_repeat('*', strlen($warn)));
+        $this->warn($warn);
+        $this->warn(str_repeat('*', strlen($warn)));
+
+        if (! $this->confirm('Confirm?')) {
+            return 0;
+        }
+
         $args = ['tables' => $tables, 'package' => $package];
-        $this->callCommand('model', $args);
+        $this->callCommand('model', array_merge_recursive($args, ['namespaces' => $namespaces]));
         $this->callCommand('routes', $args);
         $this->callCommand('lang', $args);
         $this->callCommand('permissions', $args);
-        $this->callCommand('controller', $args);
+        $this->callCommand('controller', array_merge_recursive($args, ['namespaces' => $namespaces]));
         $this->callCommand('menu', $args);
         $this->callCommand('views', $args);
     }
@@ -85,5 +101,18 @@ class CrudPackage extends Command
         }
 
         return array_unique($tables);
+    }
+
+    private function checkModel($model)
+    {
+        $msg = sprintf('Input the namespace for the model <comment>%s</comment>', $model);
+        $ns = $this->ask($msg, 'App\Models');
+
+        if (! class_exists($ns.'\\'.$model)) {
+            $this->line(' <error> Class <fg=yellow;bg=red>'.$ns.'\\'.$model.'</> does not exists </error>');
+            return $this->checkModel($model);
+        }
+
+        return $ns;
     }
 }

@@ -28,7 +28,7 @@ class Permissions extends Command
         $fileName = sprintf($str, $package, date('Y_m_d_Hi'.str_pad($this->i, 2, '0', STR_PAD_LEFT)), $resource);
 
         foreach ($this->storage->allFiles($package.'/src/database/migrations') as $file) {
-            if(preg_match('#_'.$resource.'_permissions_category.php$#', $file)) {
+            if (preg_match('#_'.$resource.'_permissions_category.php$#', $file)) {
                 $pathPrefix = $this->storage->getDriver()->getAdapter()->getPathPrefix();
                 $fileName = str_replace($pathPrefix, '', $file);
             }
@@ -50,7 +50,7 @@ class Permissions extends Command
         $fileName = sprintf($str, $package, date('Y_m_d_Hi'.str_pad($this->i, 2, '0', STR_PAD_LEFT)), $resource);
 
         foreach ($this->storage->allFiles($package.'/src/database/migrations') as $file) {
-            if(preg_match('#_'.$resource.'_permissions.php$#', $file)) {
+            if (preg_match('#_'.$resource.'_permissions.php$#', $file)) {
                 $pathPrefix = $this->storage->getDriver()->getAdapter()->getPathPrefix();
                 $fileName = str_replace($pathPrefix, '', $file);
             }

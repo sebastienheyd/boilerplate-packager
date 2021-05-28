@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 
 class Controller extends Command
 {
-    protected $signature = 'boilerplate:packager:crud:controller {package} {tables}';
+    protected $signature = 'boilerplate:packager:crud:controller {package} {tables} {namespaces?}';
     protected $description = '';
 
     public function handle()
@@ -41,6 +41,7 @@ class Controller extends Command
 
         $data = [
             'namespace' => $this->getNamespace($package),
+            'namespaces' => $this->argument('namespaces'),
             'resource' => $table,
             'vendor' => $vendor,
             'packageName' => $packageName,
