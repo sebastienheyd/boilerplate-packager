@@ -3,7 +3,6 @@
 namespace Sebastienheyd\BoilerplatePackager\Commands\Crud;
 
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Storage;
 
 class Lang extends Command
 {
@@ -34,6 +33,6 @@ class Lang extends Command
             $this->storage->put($package.'/src/resources/lang'.$dest, $content);
         }
 
-        $this->info("Writing locales");
+        $this->info('Writing locales');
     }
 }

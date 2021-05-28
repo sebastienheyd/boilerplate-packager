@@ -28,13 +28,13 @@ class CrudPackage extends Command
     public function handle()
     {
         $package = Str::lower($this->argument('package'));
-        if (!$this->packagist->checkFormat($package)) {
+        if (! $this->packagist->checkFormat($package)) {
             $this->error('Package name format must be vendor/package');
 
             return 1;
         }
 
-        if (!$this->storage->exists($package)) {
+        if (! $this->storage->exists($package)) {
             $this->error('Package does not exists');
 
             return 1;
@@ -93,7 +93,7 @@ class CrudPackage extends Command
         foreach ($migrations as $migrationFile) {
             $migration = $this->storage->get($migrationFile);
 
-            if (!preg_match_all('#Schema::create\(\s*[\'"]([a-z]+)[\'"]#', $migration, $m)) {
+            if (! preg_match_all('#Schema::create\(\s*[\'"]([a-z]+)[\'"]#', $migration, $m)) {
                 continue;
             }
 
@@ -110,6 +110,7 @@ class CrudPackage extends Command
 
         if (! class_exists($ns.'\\'.$model)) {
             $this->line(' <error> Class <fg=yellow;bg=red>'.$ns.'\\'.$model.'</> does not exists </error>');
+
             return $this->checkModel($model);
         }
 

@@ -22,15 +22,17 @@ class Command extends BaseCommand
     protected function getNamespace($package)
     {
         [$vendor, $package] = explode('/', $package);
+
         return Str::studly($vendor).'\\'.Str::studly($package);
     }
 
     protected function getColumnsFromTable($table)
     {
         $indexes = collect(Schema::getConnection()->getDoctrineSchemaManager()->listTableIndexes($table));
+
         return collect(Schema::getColumnListing($table))->map(function ($column) use ($table, $indexes) {
             $uniqueIndex = $indexes->filter(function ($index) use ($column) {
-                return in_array($column, $index->getColumns()) && ($index->isUnique() && !$index->isPrimary());
+                return in_array($column, $index->getColumns()) && ($index->isUnique() && ! $index->isPrimary());
             });
 
             $required = boolval(Schema::getConnection()->getDoctrineColumn($table, $column)->getNotnull());

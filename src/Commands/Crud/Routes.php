@@ -27,7 +27,7 @@ class Routes extends Command
             'relations' => $relations,
         ]);
 
-        $this->info("Writing routes");
+        $this->info('Writing routes');
         $this->storage->put($package.'/src/routes/'.$packageName.'.php', $routes);
     }
 }

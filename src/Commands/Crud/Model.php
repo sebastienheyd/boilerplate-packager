@@ -28,22 +28,23 @@ class Model extends Command
             'className'     => $className,
             'table'         => $table,
             'fillable'      => $columns->filter(function ($column) {
-                return !in_array($column['name'], ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token']);
+                return ! in_array($column['name'], ['id', 'created_at', 'updated_at', 'deleted_at', 'remember_token']);
             })->pluck('name')->join("','"),
             'dates'         => $columns->filter(function ($column) {
                 if (in_array($column['name'], ['created_at', 'updated_at', 'deleted_at'])) {
                     return false;
                 }
-                return $column['type'] == "datetime" || $column['type'] == "date";
+
+                return $column['type'] == 'datetime' || $column['type'] == 'date';
             })->pluck('name')->join("','"),
             'hidden'        => $columns->filter(function ($column) {
                 return in_array($column['name'], ['password', 'remember_token']);
             })->pluck('name')->join("','"),
             'timestamps'    => $columns->filter(function ($column) {
-                    return in_array($column['name'], ['created_at', 'updated_at']);
+                return in_array($column['name'], ['created_at', 'updated_at']);
             })->count() > 0,
             'hasSoftDelete' => $columns->filter(function ($column) {
-                    return $column['name'] == "deleted_at";
+                return $column['name'] == 'deleted_at';
             })->count() > 0,
             'relations' => $this->getTableRelations($table),
         ]);
