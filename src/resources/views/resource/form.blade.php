@@ -6,6 +6,8 @@
 @endif
 @if($field['type'] === 'string')
         @@component('boilerplate::input', ['name' => '{!! $field['name'] !!}', 'label' => '{{ $packageName }}::resource.{{ Str::singular($resource) }}.properties.{!! $field['name'] !!}', 'value' => ${!! Str::singular($resource) !!}->{!! $field['name'] !!} ?? ''])@@endcomponent
+@elseif($field['type'] === 'datetime')
+        @@component('boilerplate::input', ['name' => '{!! $field['name'] !!}', 'class' => 'datetimepicker-input', 'label' => '{{ $packageName }}::resource.{{ Str::singular($resource) }}.properties.{!! $field['name'] !!}', 'value' => ${!! Str::singular($resource) !!}->{!! $field['name'] !!} ?? '', 'data-toggle' => 'datetimepicker','data-target' => '#{!! $field['name'] !!}'])@@endcomponent
 @elseif($field['type'] === 'boolean')
         @@component('boilerplate::icheck', ['name' => '{!! $field['name'] !!}', 'label' => '{{ $packageName }}::resource.{{ Str::singular($resource) }}.properties.{!! $field['name'] !!}', 'checked' => old('{!! $field['name'] !!}', ${!! Str::singular($resource) !!}->{!! $field['name'] !!} ?? false)])@@endcomponent
 @else
@@ -38,3 +40,14 @@
 @endforeach
     @@endcomponent
 </div>
+@foreach($fields as $field)
+@if($field['type'] === 'datetime')
+
+@@include('boilerplate::load.datepicker')
+@@push('js')
+     <script>
+         $('#{!! $field['name'] !!}').datetimepicker();
+     </script>
+@@endpush
+@endif
+@endforeach

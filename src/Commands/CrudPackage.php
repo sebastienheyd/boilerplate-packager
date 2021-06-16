@@ -48,7 +48,9 @@ class CrudPackage extends Command
             return 1;
         }
 
-        foreach ($tables as $table) {
+        $namespaces = [];
+
+        foreach ($tables as $k => $table) {
             foreach (Schema::getConnection()->getDoctrineSchemaManager()->listTableForeignKeys($table) as $fk) {
                 if (in_array($fk->getForeignTableName(), $tables)) {
                     continue;
@@ -56,6 +58,11 @@ class CrudPackage extends Command
 
                 $model = Str::studly(Str::singular($fk->getForeignTableName()));
                 $namespaces[$fk->getForeignTableName()] = $this->checkModel($model);
+            }
+
+            // Remove pivot tables
+            if(preg_match('#^([a-z]+)_([a-z]+)$#', $table)) {
+                unset($tables[$k]);
             }
         }
 
@@ -93,7 +100,7 @@ class CrudPackage extends Command
         foreach ($migrations as $migrationFile) {
             $migration = $this->storage->get($migrationFile);
 
-            if (! preg_match_all('#Schema::create\(\s*[\'"]([a-z]+)[\'"]#', $migration, $m)) {
+            if (! preg_match_all('#Schema::create\(\s*[\'"]([a-z_]+)[\'"]#', $migration, $m)) {
                 continue;
             }
 
