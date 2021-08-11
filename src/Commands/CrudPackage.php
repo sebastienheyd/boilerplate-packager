@@ -61,7 +61,7 @@ class CrudPackage extends Command
             }
 
             // Remove pivot tables
-            if(preg_match('#^([a-z]+)_([a-z]+)$#', $table)) {
+            if (preg_match('#^([a-z]+)_([a-z]+)$#', $table)) {
                 unset($tables[$k]);
             }
         }
