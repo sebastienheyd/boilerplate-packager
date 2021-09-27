@@ -22,6 +22,7 @@ class CreatePackage extends Command
 
     /**
      * @return int
+     *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function handle()

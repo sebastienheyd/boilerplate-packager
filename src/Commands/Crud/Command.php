@@ -126,8 +126,7 @@ class Command extends BaseCommand
     /**
      * Get the first label field from table structure.
      *
-     * @param string $table
-     *
+     * @param  string  $table
      * @return false|string
      */
     private function getTableLabelField($table)
@@ -154,8 +153,7 @@ class Command extends BaseCommand
     /**
      * Get model class name from table name.
      *
-     * @param string $table
-     *
+     * @param  string  $table
      * @return string
      */
     private function getClassFromRelationTable($table)

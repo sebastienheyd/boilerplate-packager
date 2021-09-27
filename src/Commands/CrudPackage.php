@@ -22,8 +22,9 @@ class CrudPackage extends Command
     protected $description = '';
 
     /**
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      * @return int
+     *
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function handle()
     {

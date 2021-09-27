@@ -47,8 +47,8 @@ class Skeleton
     /**
      * Copy or download the skeleton content and put it in packages temporary folder.
      *
-     * @param string $url
-     * @param string $branch
+     * @param  string  $url
+     * @param  string  $branch
      * @return bool
      */
     public function download($url, $branch)
@@ -75,8 +75,8 @@ class Skeleton
      * Recursive copy of skeleton files.
      * This will not use Storage facade because skeleton folder can be outside of the packages directory.
      *
-     * @param string $src
-     * @param string $dst
+     * @param  string  $src
+     * @param  string  $dst
      */
     private function recurse_copy($src, $dst)
     {
@@ -125,6 +125,7 @@ class Skeleton
      * Rename files that are declared in packager.json.
      *
      * @return false
+     *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     private function moveFiles()
