@@ -4,6 +4,7 @@ namespace Sebastienheyd\BoilerplatePackager\Commands\Crud;
 
 use Doctrine\DBAL\Types\StringType;
 use Illuminate\Console\Command as BaseCommand;
+use Illuminate\Foundation\Application as Laravel;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -11,11 +12,13 @@ use Illuminate\Support\Str;
 class Command extends BaseCommand
 {
     protected $storage;
+    protected $isLaravelEqualOrGreaterThan7;
 
     public function __construct()
     {
         parent::__construct();
 
+        $this->isLaravelEqualOrGreaterThan7 = version_compare(Laravel::VERSION, '7.0', '>=');
         $this->storage = Storage::disk('packages');
     }
 
@@ -48,12 +51,13 @@ class Command extends BaseCommand
 
     protected function getTableRelations($tableName)
     {
-        $tables = Schema::getConnection()->getDoctrineSchemaManager()->listTables();
+        $schemaManager = Schema::getConnection()->getDoctrineSchemaManager();
+        $schemaManager->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
 
         $relations = [];
 
         /** @var \Doctrine\DBAL\Schema\Table $table */
-        foreach ($tables as $table) {
+        foreach ($schemaManager->listTables() as $table) {
             if (preg_match('#^([a-z]+)_([a-z]+)$#', $table->getName())) {
                 $return = false;
                 $foreignTable = [];

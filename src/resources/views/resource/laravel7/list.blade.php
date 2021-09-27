@@ -36,6 +36,7 @@
 @@include('boilerplate::load.datatables')
 
 @@push('js')
+&lt;x-boilerplate::minify>
     <script>
         dTable = $('#menus-table').DataTable({
             processing: true,
@@ -48,7 +49,21 @@
             order: [[0, 'desc']],
             columns: [
 @foreach($fields as $field)
+@if($field['type'] === 'date')
+                {
+                    data: '{!! $field['name'] !!}',
+                    name: '{!! $field['name'] !!}',
+                    render: (d) => { return d !== null ? moment(d).format('@{{ __('boilerplate::date.Ymd') }}') : '-' }
+                },
+@elseif($field['type'] === 'datetime')
+                {
+                    data: '{!! $field['name'] !!}',
+                    name: '{!! $field['name'] !!}',
+                    render: (d) => { return d !== null ? moment(d).format('@{{ __('boilerplate::date.YmdHis') }}') : '-' }
+                },
+@else
                 {data: '{!! $field['name'] !!}', name: '{!! $field['name'] !!}'},
+@endif
 @endforeach
                 {
                     data: 'buttons',
@@ -61,11 +76,11 @@
             ]
         })
 
-        $(document).on('click', 'button[data-action=show]', function (e) {
+        $(document).on('click', 'button[data-action=show]', function() {
             $.ajax({
                 url: $(this).data('href'),
                 type: 'get',
-                success: function (res) {
+                success: function(res) {
                     bootbox.dialog({
                         onEscape: true,
                         size: 'xl',
@@ -75,18 +90,18 @@
             })
         })
 
-        $(document).on('click', 'button[data-action=delete]', function (e) {
+        $(document).on('click', 'button[data-action=delete]', function(e) {
             e.preventDefault()
-            let url = $(this).data('href')
-            bootbox.confirm("@@lang('{{ $packageName }}::resource.{{ Str::singular($resource) }}.delete_confirm')", function (res) {
-                if (res === false) {
+            let url = $(this).data('href');
+            bootbox.confirm("@@lang('{{ $packageName }}::resource.{{ Str::singular($resource) }}.delete_confirm')", function(r) {
+                if (r === false) {
                     return
                 }
 
                 $.ajax({
                     url: url,
                     type: 'delete',
-                    success: function (res) {
+                    success: function(res) {
                         if (res.success) {
                             dTable.ajax.reload()
                             growl("@@lang('{{ $packageName }}::resource.{{ Str::singular($resource) }}.delete_success')", "success")
@@ -96,4 +111,5 @@
             })
         })
     </script>
+&lt;/x-boilerplate::minify>
 @@endpush

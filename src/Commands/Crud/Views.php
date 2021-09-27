@@ -39,6 +39,7 @@ class Views extends Command
             $fields[] = [
                 'name' => $column['name'],
                 'type' => $column['type'],
+                'required' => $column['required'],
                 'rules' => join('|', $rules),
             ];
         }
@@ -52,15 +53,16 @@ class Views extends Command
             'relations' => $relations,
         ];
 
-        $path = __DIR__.'/../../resources/views/resource';
+        $path = __DIR__.'/../../resources/views/resource/laravel6';
         $files = (new Filesystem())->allFiles($path);
 
         foreach ($files as $file) {
             $dest = str_replace($path, '', $file);
             $view = str_replace(['.blade.php', '/'], '', $dest);
+            $view = ($this->isLaravelEqualOrGreaterThan7 ? 'laravel7' : 'laravel6').'.'.$view;
 
             $content = (string) view('packager::resource.'.$view, $data);
-            $this->storage->put($package.'/src/resources/views/'.Str::singular($table).$dest, $content);
+            $this->storage->put($package.'/src/resources/views/'.Str::singular($table).$dest, html_entity_decode($content));
         }
     }
 }
