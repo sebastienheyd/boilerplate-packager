@@ -13,6 +13,7 @@ class Command extends BaseCommand
 {
     protected $storage;
     protected $isLaravelEqualOrGreaterThan7;
+    protected $prefix;
 
     public function __construct()
     {
@@ -49,8 +50,9 @@ class Command extends BaseCommand
         });
     }
 
-    protected function getTableRelations($tableName)
+    protected function getTableRelations($tableName, $prefix = null)
     {
+        $this->prefix = $prefix;
         $schemaManager = Schema::getConnection()->getDoctrineSchemaManager();
         $schemaManager->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
 
@@ -67,7 +69,7 @@ class Command extends BaseCommand
                         $return = true;
                     } else {
                         $foreignTable = [
-                            'method' => $fk->getForeignTableName(),
+                            'method' => $this->removePrefix($fk->getForeignTableName()),
                             'model' => $this->getClassFromRelationTable($fk->getForeignTableName()),
                             'labelField' => $this->getTableLabelField($fk->getForeignTableName()),
                             'idField' => $this->getTableIdField($fk->getForeignTableName()),
@@ -85,7 +87,7 @@ class Command extends BaseCommand
             foreach ($table->getForeignKeys() as $fk) {
                 if ($fk->getForeignTableName() === $tableName) {
                     $relations['hasMany'][] = [
-                        'method' => $fk->getLocalTableName(),
+                        'method' => $this->removePrefix($fk->getLocalTableName()),
                         'model' => $this->getClassFromRelationTable($fk->getLocalTableName()),
                         'labelField' => $this->getTableLabelField($fk->getLocalTableName()),
                         'idField' => $this->getTableIdField($fk->getLocalTableName()),
@@ -97,7 +99,7 @@ class Command extends BaseCommand
                     $req = Schema::getConnection()->getDoctrineColumn($tableName, $fk->getColumns()[0])->getNotnull();
 
                     $relations['belongsTo'][] = [
-                        'method' => $fk->getForeignTableName(),
+                        'method' => $this->removePrefix($fk->getForeignTableName()),
                         'model' => $this->getClassFromRelationTable($fk->getForeignTableName()),
                         'labelField' => $this->getTableLabelField($fk->getForeignTableName()),
                         'idField' => $this->getTableIdField($fk->getForeignTableName()),
@@ -108,6 +110,15 @@ class Command extends BaseCommand
         }
 
         return $relations;
+    }
+
+    private function removePrefix($name)
+    {
+        if (isset($this->prefix)) {
+            return preg_replace("#^$this->prefix#", '', $name);
+        }
+
+        return $name;
     }
 
     private function getTableIdField($table)
@@ -158,6 +169,6 @@ class Command extends BaseCommand
      */
     private function getClassFromRelationTable($table)
     {
-        return Str::studly(Str::singular($table));
+        return Str::studly(Str::singular($this->removePrefix($table)));
     }
 }

@@ -3,6 +3,7 @@
 namespace Sebastienheyd\BoilerplatePackager\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Console\Parser;
 use Illuminate\Support\Facades\Storage;
 
 class Packager extends Command
@@ -13,9 +14,8 @@ class Packager extends Command
      * @var string
      */
     protected $signature = 'boilerplate:packager
-        {action? : new, install, remove, list}
-        {package? : Package name in vendor/package format or repository URL (for install only)}
-        {--dev : Put package in require-dev section}';
+        {action? : new, install, remove, list, crud}
+        {package? : Package name in vendor/package format or repository URL (for install only)}';
 
     /**
      * The console command description.
@@ -25,7 +25,7 @@ class Packager extends Command
     protected $description = 'Manage packages for sebastienheyd/boilerplate';
 
     /**
-     * @var \Illuminate\Support\Facades\Storage
+     * @var Storage
      */
     protected $storage;
 
@@ -76,7 +76,8 @@ class Packager extends Command
             return 0;
         }
 
-        $this->getApplication()->addCommands([$this->resolveCommand(__NAMESPACE__.'\\'.ucfirst($action).'Package')]);
+        $command = $this->resolveCommand(__NAMESPACE__.'\\'.ucfirst($action).'Package');
+        $this->getApplication()->addCommands([$command]);
 
         $args = [];
 
@@ -84,8 +85,10 @@ class Packager extends Command
             $args['package'] = $this->argument('package');
         }
 
-        if ($this->option('dev')) {
-            $args['--dev'] = true;
+        foreach ($this->options() as $k => $v) {
+            if($v !== false) {
+                $args['--'.$k] = $v;
+            }
         }
 
         return $this->call('boilerplate:packager:'.$action, $args);
@@ -120,6 +123,25 @@ class Packager extends Command
             }
 
             $this->line('<fg=green>'.str_pad($shortCut.' --'.$name, 25, ' ', STR_PAD_RIGHT).'</> '.$option->getDescription());
+        }
+    }
+
+    protected function configureUsingFluentDefinition()
+    {
+        parent::configureUsingFluentDefinition();
+
+        if (isset($_SERVER['argv'][2]) && $action = $_SERVER['argv'][2]) {
+            $class = __NAMESPACE__.'\\'.ucfirst($action).'Package';
+
+            if (class_exists($class)) {
+                $this->laravel = app();
+
+                $command = $this->resolveCommand($class);
+
+                [$name, $arguments, $options] = Parser::parse($command->getSignature());
+
+                $this->getDefinition()->addOptions($options);
+            }
         }
     }
 }

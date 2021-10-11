@@ -103,6 +103,18 @@ the namespace related to the model needed for the relationship.
 
 Be careful, if files already exist in the package they will be overwritten.
 
+You can generate specified resources by using the option `--only` and one or many of the following keywords : `model`, `routes`, `lang`, `permissions`, `controller`, `menu`, `views`
+
+```
+php artisan boilerplate:packager crud my-vendor/my-package --only=views --only=routes
+```
+
+Sometimes your package will use prefixed tables, to avoid generating files with the prefix you can remove it by using the option `--prefix`
+
+```
+php artisan boilerplate:packager crud my-vendor/my-package --prefix=myprefix__
+```
+
 ## Test and coding standard
 
 This package is delivered with tests, to launch tests just launch:

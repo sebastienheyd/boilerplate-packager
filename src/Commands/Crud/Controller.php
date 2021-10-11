@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 
 class Controller extends Command
 {
-    protected $signature = 'boilerplate:packager:crud:controller {package} {tables} {namespaces?}';
+    protected $signature = 'boilerplate:packager:crud:controller {package} {tables} {namespaces?} {prefix?}';
     protected $description = '';
 
     public function handle()
@@ -21,7 +21,7 @@ class Controller extends Command
         $package = $this->argument('package');
         [$vendor, $packageName] = explode('/', $package);
         $columns = $this->getColumnsFromTable($table);
-        $relations = $this->getTableRelations($table);
+        $relations = $this->getTableRelations($table, $this->argument('prefix'));
 
         $fillable = [];
 
@@ -42,7 +42,7 @@ class Controller extends Command
         $data = [
             'namespace' => $this->getNamespace($package),
             'namespaces' => $this->argument('namespaces'),
-            'resource' => $table,
+            'resource' => preg_replace('#^'.$this->argument('prefix').'#', '', $table),
             'vendor' => $vendor,
             'packageName' => $packageName,
             'fillable' => $fillable,
@@ -50,6 +50,10 @@ class Controller extends Command
         ];
 
         $model = (string) view('packager::controller', $data);
-        $this->storage->put($package.'/src/Controllers/'.Str::studly(Str::singular($table)).'Controller.php', $model);
+
+        $className = Str::studly(Str::singular(preg_replace('#^'.$this->argument('prefix').'#', '', $table)));
+
+        $this->info("Writing $className controller");
+        $this->storage->put($package.'/src/Controllers/'.$className.'Controller.php', $model);
     }
 }

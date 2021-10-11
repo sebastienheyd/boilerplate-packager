@@ -12,7 +12,10 @@ class CrudPackage extends Command
      *
      * @var string
      */
-    protected $signature = 'boilerplate:packager:crud {package : package name where to scaffold}';
+    protected $signature = 'boilerplate:packager:crud 
+        {package : package name where to scaffold} 
+        {--prefix= : Table prefix to remove when generating files}
+        {--only=* : Define which files you want to generate (model, routes, lang, permissions, controller, menu, views}';
 
     /**
      * The console command description.
@@ -21,10 +24,11 @@ class CrudPackage extends Command
      */
     protected $description = '';
 
+    protected $options = [];
+
     /**
      * @return int
      *
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function handle()
     {
@@ -77,6 +81,10 @@ class CrudPackage extends Command
         }
 
         $args = ['tables' => $tables, 'package' => $package];
+
+        $this->options = $this->option('only');
+        $args['prefix'] = $this->option('prefix');
+
         $this->callCommand('model', array_merge_recursive($args, ['namespaces' => $namespaces]));
         $this->callCommand('routes', $args);
         $this->callCommand('lang', $args);
@@ -88,8 +96,10 @@ class CrudPackage extends Command
 
     private function callCommand($action, $args)
     {
-        $this->getApplication()->addCommands([$this->resolveCommand(__NAMESPACE__.'\\Crud\\'.ucfirst($action))]);
-        $this->call('boilerplate:packager:crud:'.$action, $args);
+        if (empty($this->options) || in_array($action, $this->options)) {
+            $this->getApplication()->addCommands([$this->resolveCommand(__NAMESPACE__.'\\Crud\\'.ucfirst($action))]);
+            $this->call('boilerplate:packager:crud:'.$action, $args);
+        }
     }
 
     private function getPackageTables($package)

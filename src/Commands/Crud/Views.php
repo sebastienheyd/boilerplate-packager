@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 
 class Views extends Command
 {
-    protected $signature = 'boilerplate:packager:crud:views {package} {tables}';
+    protected $signature = 'boilerplate:packager:crud:views {package} {tables} {prefix?}';
     protected $description = '';
 
     public function handle()
@@ -22,7 +22,7 @@ class Views extends Command
         $package = $this->argument('package');
         [$vendor, $packageName] = explode('/', $package);
         $columns = $this->getColumnsFromTable($table);
-        $relations = $this->getTableRelations($table);
+        $relations = $this->getTableRelations($table, $this->argument('prefix'));
 
         $fields = [];
         foreach ($columns as $column) {
@@ -46,7 +46,7 @@ class Views extends Command
 
         $data = [
             'namespace' => $this->getNamespace($package),
-            'resource' => $table,
+            'resource' => preg_replace('#^'.$this->argument('prefix').'#', '', $table),
             'vendor' => $vendor,
             'packageName' => $packageName,
             'fields' => $fields,
@@ -62,6 +62,9 @@ class Views extends Command
             $view = ($this->isLaravelEqualOrGreaterThan7 ? 'laravel7' : 'laravel6').'.'.$view;
 
             $content = (string) view('packager::resource.'.$view, $data);
+            $table = preg_replace('#^'.$this->argument('prefix').'#', '', $table);
+
+            $this->info('Writing '.$table.$dest.' view');
             $this->storage->put($package.'/src/resources/views/'.Str::singular($table).$dest, html_entity_decode($content));
         }
     }

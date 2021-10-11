@@ -2,6 +2,7 @@
 
 namespace Sebastienheyd\BoilerplatePackager\Commands;
 
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Str;
 
 class CreatePackage extends Command
@@ -11,7 +12,7 @@ class CreatePackage extends Command
      *
      * @var string
      */
-    protected $signature = 'boilerplate:packager:create {package} {--dev}';
+    protected $signature = 'boilerplate:packager:create {package} {--dev : Put package in require-dev section}';
 
     /**
      * The console command description.
@@ -23,7 +24,7 @@ class CreatePackage extends Command
     /**
      * @return int
      *
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws FileNotFoundException
      */
     public function handle()
     {

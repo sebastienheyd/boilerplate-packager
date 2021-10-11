@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 
 class Permissions extends Command
 {
-    protected $signature = 'boilerplate:packager:crud:permissions {package} {tables}';
+    protected $signature = 'boilerplate:packager:crud:permissions {package} {tables} {prefix?}';
     protected $description = '';
 
     protected $i = 0;
@@ -22,7 +22,7 @@ class Permissions extends Command
     private function buildPermissionsCategory($table)
     {
         $package = $this->argument('package');
-        $resource = Str::singular($table);
+        $resource = Str::singular(preg_replace('#^'.$this->argument('prefix').'#', '', $table));
 
         $str = '%s/src/database/migrations/%s_%s_permissions_category.php';
         $fileName = sprintf($str, $package, date('Y_m_d_Hi'.str_pad($this->i, 2, '0', STR_PAD_LEFT)), $resource);
@@ -37,6 +37,7 @@ class Permissions extends Command
         [$vendor, $name] = explode('/', $package);
         $content = (string) view('packager::permissions_category', compact('resource', 'name'));
 
+        $this->info("Writing $resource permissions category");
         $this->storage->put($fileName, $content);
         $this->i++;
     }
@@ -44,7 +45,7 @@ class Permissions extends Command
     private function buildPermissions($table)
     {
         $package = $this->argument('package');
-        $resource = Str::singular($table);
+        $resource = Str::singular(preg_replace('#^'.$this->argument('prefix').'#', '', $table));
 
         $str = '%s/src/database/migrations/%s_%s_permissions.php';
         $fileName = sprintf($str, $package, date('Y_m_d_Hi'.str_pad($this->i, 2, '0', STR_PAD_LEFT)), $resource);
@@ -59,6 +60,7 @@ class Permissions extends Command
         [$vendor, $name] = explode('/', $package);
         $content = (string) view('packager::permissions', compact('resource', 'name'));
 
+        $this->info("Writing $resource permissions");
         $this->storage->put($fileName, $content);
         $this->i++;
     }

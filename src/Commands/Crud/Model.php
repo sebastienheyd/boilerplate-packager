@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 
 class Model extends Command
 {
-    protected $signature = 'boilerplate:packager:crud:model {package} {tables} {namespaces?}';
+    protected $signature = 'boilerplate:packager:crud:model {package} {tables} {namespaces?} {prefix?}';
     protected $description = '';
 
     public function handle()
@@ -19,7 +19,7 @@ class Model extends Command
     private function buildModel($table)
     {
         $package = $this->argument('package');
-        $className = Str::studly(Str::singular($table));
+        $className = Str::studly(Str::singular(preg_replace('#^'.$this->argument('prefix').'#', '', $table)));
         $columns = $this->getColumnsFromTable($table);
 
         $model = (string) view('packager::model', [
@@ -46,7 +46,7 @@ class Model extends Command
             'hasSoftDelete' => $columns->filter(function ($column) {
                 return $column['name'] == 'deleted_at';
             })->count() > 0,
-            'relations' => $this->getTableRelations($table),
+            'relations' => $this->getTableRelations($table, $this->argument('prefix')),
         ]);
 
         $this->info("Writing $className model");

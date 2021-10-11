@@ -6,22 +6,26 @@ use Illuminate\Filesystem\Filesystem;
 
 class Lang extends Command
 {
-    protected $signature = 'boilerplate:packager:crud:lang {package} {tables}';
+    protected $signature = 'boilerplate:packager:crud:lang {package} {tables} {prefix?}';
     protected $description = '';
 
     public function handle()
     {
         $package = $this->argument('package');
-        $resources = $this->argument('tables');
+        $tables = $this->argument('tables');
 
         $path = __DIR__.'/../../resources/views/lang';
         $files = (new Filesystem())->allFiles($path);
 
         $fields = [];
         $relations = [];
-        foreach ($resources as $table) {
-            $fields[$table] = $this->getColumnsFromTable($table)->pluck('name');
-            $relations[$table] = $this->getTableRelations($table);
+        $resources = [];
+
+        foreach ($tables as $table) {
+            $resource = preg_replace('#^'.$this->argument('prefix').'#', '', $table);
+            $resources[] = $resource;
+            $fields[$resource] = $this->getColumnsFromTable($table)->pluck('name');
+            $relations[$resource] = $this->getTableRelations($table, $this->argument('prefix'));
         }
 
         foreach ($files as $file) {

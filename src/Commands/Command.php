@@ -52,4 +52,9 @@ class Command extends BaseCommand
         $this->skeleton = $skeleton;
         $this->storage = Storage::disk('packages');
     }
+
+    public function getSignature()
+    {
+        return $this->signature;
+    }
 }

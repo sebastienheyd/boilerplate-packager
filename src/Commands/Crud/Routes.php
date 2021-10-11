@@ -4,7 +4,7 @@ namespace Sebastienheyd\BoilerplatePackager\Commands\Crud;
 
 class Routes extends Command
 {
-    protected $signature = 'boilerplate:packager:crud:routes {package} {tables}';
+    protected $signature = 'boilerplate:packager:crud:routes {package} {tables} {prefix?}';
     protected $description = '';
 
     public function handle()
@@ -14,20 +14,23 @@ class Routes extends Command
 
         $relations = [];
         foreach ($this->argument('tables') as $table) {
-            $relations[$table] = $this->getTableRelations($table);
+            $tableNoPrefix = preg_replace('#^'.$this->argument('prefix').'#', '', $table);
+            $relations[$tableNoPrefix] = $this->getTableRelations($table, $this->argument('prefix'));
         }
 
-//        dd($relations);
+        $tables = collect($this->argument('tables'))->map(function($el) {
+            return preg_replace('#^'.$this->argument('prefix').'#', '', $el);
+        });
 
         $routes = (string) view('packager::routes', [
-            'models' => $this->argument('tables'),
+            'models' => $tables,
             'namespace' => $this->getNamespace($this->argument('package')),
             'vendor' => $vendor,
             'package' => $packageName,
             'relations' => $relations,
         ]);
 
-        $this->info('Writing routes');
+        $this->info("Writing $packageName routes");
         $this->storage->put($package.'/src/routes/'.$packageName.'.php', $routes);
     }
 }
