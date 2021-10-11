@@ -18,7 +18,7 @@ class Routes extends Command
             $relations[$tableNoPrefix] = $this->getTableRelations($table, $this->argument('prefix'));
         }
 
-        $tables = collect($this->argument('tables'))->map(function($el) {
+        $tables = collect($this->argument('tables'))->map(function ($el) {
             return preg_replace('#^'.$this->argument('prefix').'#', '', $el);
         });
 

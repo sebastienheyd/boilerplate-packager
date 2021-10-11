@@ -86,7 +86,7 @@ class Packager extends Command
         }
 
         foreach ($this->options() as $k => $v) {
-            if($v !== false) {
+            if ($v !== false) {
                 $args['--'.$k] = $v;
             }
         }

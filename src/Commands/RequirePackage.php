@@ -23,8 +23,9 @@ class RequirePackage extends Command
     /**
      * Execute the console command.
      *
-     * @throws FileNotFoundException
      * @return int|void
+     *
+     * @throws FileNotFoundException
      */
     public function handle()
     {

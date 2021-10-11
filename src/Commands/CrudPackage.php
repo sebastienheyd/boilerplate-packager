@@ -28,7 +28,6 @@ class CrudPackage extends Command
 
     /**
      * @return int
-     *
      */
     public function handle()
     {

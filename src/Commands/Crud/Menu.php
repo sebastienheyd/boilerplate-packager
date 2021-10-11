@@ -14,7 +14,7 @@ class Menu extends Command
         $package = $this->argument('package');
         [$vendor, $packageName] = explode('/', $package);
 
-        $tables = collect($this->argument('tables'))->map(function($el) {
+        $tables = collect($this->argument('tables'))->map(function ($el) {
             return preg_replace('#^'.$this->argument('prefix').'#', '', $el);
         });
 
