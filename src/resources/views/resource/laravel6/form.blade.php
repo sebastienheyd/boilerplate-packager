@@ -4,9 +4,7 @@
 @if($field['name'] === 'id')
 @continue
 @endif
-@if($field['type'] === 'string')
-        @@component('boilerplate::input', ['name' => '{!! $field['name'] !!}', 'label' => '{{ $packageName }}::resource.{{ Str::singular($resource) }}.properties.{!! $field['name'] !!}', 'value' => ${!! Str::singular($resource) !!}->{!! $field['name'] !!} ?? ''])@@endcomponent
-@elseif($field['type'] === 'datetime' || $field['type'] === 'date')
+@if($field['type'] === 'datetime' || $field['type'] === 'date')
         @@component('boilerplate::datetimepicker', ['name' => '{!! $field['name'] !!}', 'class' => 'datetimepicker-input', 'label' => '{{ $packageName }}::resource.{{ Str::singular($resource) }}.properties.{!! $field['name'] !!}', 'value' => ${!! Str::singular($resource) !!}->{!! $field['name'] !!} ?? '', 'format' => {!! $field['type'] === 'datetime' ? "__('boilerplate::date.YmdHis')"  : "__('boilerplate::date.Ymd')" !!}])@@endcomponent
 @elseif($field['type'] === 'boolean')
         @@component('boilerplate::icheck', ['name' => '{!! $field['name'] !!}', 'label' => '{{ $packageName }}::resource.{{ Str::singular($resource) }}.properties.{!! $field['name'] !!}', 'checked' => old('{!! $field['name'] !!}', ${!! Str::singular($resource) !!}->{!! $field['name'] !!} ?? false)])@@endcomponent
