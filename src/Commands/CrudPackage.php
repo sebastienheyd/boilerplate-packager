@@ -13,9 +13,9 @@ class CrudPackage extends Command
      * @var string
      */
     protected $signature = 'boilerplate:packager:crud 
-        {package : package name where to scaffold} 
+        {package? : package name where to scaffold} 
         {--prefix= : Table prefix to remove when generating files}
-        {--only=* : Define which files you want to generate (model, routes, lang, permissions, controller, menu, views}';
+        {--only=* : Define which files you want to generate (model, datatable, routes, lang, permissions, controller, menu, views}';
 
     /**
      * The console command description.
@@ -31,7 +31,7 @@ class CrudPackage extends Command
      */
     public function handle()
     {
-        $package = Str::lower($this->argument('package'));
+        $package = $this->getPackage();
         if (! $this->packagist->checkFormat($package)) {
             $this->error('Package name format must be vendor/package');
 
@@ -84,6 +84,7 @@ class CrudPackage extends Command
         $this->options = $this->option('only');
         $args['prefix'] = $this->option('prefix');
 
+        $this->callCommand('datatable', array_merge_recursive($args, ['namespaces' => $namespaces]));
         $this->callCommand('model', array_merge_recursive($args, ['namespaces' => $namespaces]));
         $this->callCommand('routes', $args);
         $this->callCommand('lang', $args);

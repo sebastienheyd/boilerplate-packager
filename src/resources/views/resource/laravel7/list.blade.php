@@ -16,69 +16,18 @@
             </span>
         </div>
     </div>
-    @@component('boilerplate::card')
-        <div class="table-responsive">
-            <table class="table table-striped table-hover va-middle" id="menus-table">
-                <thead>
-                    <tr>
-@foreach($fields as $field)
-                        <th>@@lang('{{ $packageName }}::resource.{{ Str::singular($resource) }}.properties.{{ $field['name'] }}')</th>
-@endforeach
-                        <th>{{-- buttons --}}</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    @@endcomponent
+    &lt;x-boilerplate::card>
+        &lt;x-boilerplate::datatable name="{{ $resource }}" />
+    &lt;/x-boilerplate::card>
 @@endsection
-
-@@include('boilerplate::load.datatables')
 
 @@push('js')
 &lt;x-boilerplate::minify>
     <script>
-        dTable = $('#menus-table').DataTable({
-            processing: true,
-            serverSide: true,
-            autoWidth: false,
-            ajax: {
-                url: '@{!! route('{{ $packageName }}.{{ Str::singular($resource) }}.datatable') !!}',
-                type: 'post',
-            },
-            order: [[0, 'desc']],
-            columns: [
-@foreach($fields as $field)
-@if($field['type'] === 'date')
-                {
-                    data: '{!! $field['name'] !!}',
-                    name: '{!! $field['name'] !!}',
-                    render: (d) => { return d !== null ? moment(d).format('@{{ __('boilerplate::date.Ymd') }}') : '-' }
-                },
-@elseif($field['type'] === 'datetime')
-                {
-                    data: '{!! $field['name'] !!}',
-                    name: '{!! $field['name'] !!}',
-                    render: (d) => { return d !== null ? moment(d).format('@{{ __('boilerplate::date.YmdHis') }}') : '-' }
-                },
-@else
-                {data: '{!! $field['name'] !!}', name: '{!! $field['name'] !!}'},
-@endif
-@endforeach
-                {
-                    data: 'buttons',
-                    name: 'buttons',
-                    orderable: false,
-                    searchable: false,
-                    width: '60px',
-                    class: "visible-on-hover text-nowrap"
-                }
-            ]
-        })
-
-        $(document).on('click', 'button[data-action=show]', function() {
+        $(document).on('click', 'a.show-{{ Str::singular($resource) }}', function(e) {
+            e.preventDefault();
             $.ajax({
-                url: $(this).data('href'),
+                url: $(this).attr('href'),
                 type: 'get',
                 success: function(res) {
                     bootbox.dialog({
@@ -90,9 +39,9 @@
             })
         })
 
-        $(document).on('click', 'button[data-action=delete]', function(e) {
-            e.preventDefault()
-            let url = $(this).data('href');
+        $(document).on('click', 'a.delete-{{ Str::singular($resource) }}', function(e) {
+            e.preventDefault();
+            let url = $(this).attr('href');
             bootbox.confirm("@@lang('{{ $packageName }}::resource.{{ Str::singular($resource) }}.delete_confirm')", function(r) {
                 if (r === false) {
                     return
@@ -103,7 +52,7 @@
                     type: 'delete',
                     success: function(res) {
                         if (res.success) {
-                            dTable.ajax.reload()
+                            dt{{ Str::studly($resource) }}.ajax.reload();
                             growl("@@lang('{{ $packageName }}::resource.{{ Str::singular($resource) }}.delete_success')", "success")
                         }
                     }

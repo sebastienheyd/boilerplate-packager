@@ -8,6 +8,8 @@
         &lt;x-boilerplate::datetimepicker name="{!! $field['name'] !!}" label="{{ $packageName }}::resource.{{ Str::singular($resource) }}.properties.{!! $field['name'] !!}" :value="${!! Str::singular($resource) !!}->{!! $field['name'] !!} ?? ''" :format="{!! $field['type'] === 'datetime' ? "__('boilerplate::date.YmdHis')"  : "__('boilerplate::date.Ymd')" !!}" />
 @elseif($field['type'] === 'boolean')
         &lt;x-boilerplate::icheck name="{!! $field['name'] !!}" label="{{ $packageName }}::resource.{{ Str::singular($resource) }}.properties.{!! $field['name'] !!}" :checked="old('{!! $field['name'] !!}', ${!! Str::singular($resource) !!}->{!! $field['name'] !!} ?? false)"/>
+@elseif($field['type'] === 'text' || $field['type'] === 'blob')
+        &lt;x-boilerplate::tinymce name="{!! $field['name'] !!}" label="{{ $packageName }}::resource.{{ Str::singular($resource) }}.properties.{!! $field['name'] !!}" :value="${!! Str::singular($resource) !!}->{!! $field['name'] !!} ?? ''" />
 @else
         &lt;x-boilerplate::input name="{!! $field['name'] !!}" label="{{ $packageName }}::resource.{{ Str::singular($resource) }}.properties.{!! $field['name'] !!}" :value="${!! Str::singular($resource) !!}->{!! $field['name'] !!} ?? ''" />
 @endif

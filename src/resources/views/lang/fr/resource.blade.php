@@ -14,14 +14,14 @@ return [
         'update_success' => 'Le {{ Str::singular($resource) }} a été mis à jour',
         'properties'     => [
 @foreach($fields[$resource] as $field)
-            '{{ $field }}' => '{{ ucfirst(str_replace(['_id', '_'], ['', ' '], $field)) }}',
+            '{{ $field }}' => '{{ __(ucfirst(str_replace(['_id', '_'], ['', ' '], $field))) }}',
 @endforeach
 @foreach($relations[$resource] as $type => $rels)
 @foreach($rels as $value)
 @if(in_array($type, ['hasMany', 'belongsToMany']))
-            '{{ $value['method'] }}' => '{{ ucfirst($value['method']) }}',
+            '{{ $value['method'] }}' => '{{ __(ucfirst($value['method'])) }}',
 @else
-            '{{ Str::singular($value['method']) }}' => '{{ ucfirst(Str::singular($value['method'])) }}',
+            '{{ Str::singular($value['method']) }}' => '{{ __(ucfirst(Str::singular($value['method']))) }}',
 @endif
 @endforeach
 @endforeach

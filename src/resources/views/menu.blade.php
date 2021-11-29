@@ -18,7 +18,7 @@ class {{ Str::studly($packageName) }}Menu
         $menu->addTo('{{ Str::snake(Str::studly($packageName)) }}_{{ $model }}', __('{{ $packageName }}::menu.{{ $model }}.index'), [
             'route'      => '{{ $packageName }}.{{ $model }}.index',
             'permission' => '{{ $model }}_access'
-        ])->activeIfRoute(['{{ $packageName }}.{{ $model }}.index', 'menus-manager.{{ $model }}.edit']);
+        ])->activeIfRoute(['{{ $packageName }}.{{ $model }}.index', '{{ $packageName }}.{{ $model }}.edit']);
 
         $menu->addTo('{{ Str::snake(Str::studly($packageName)) }}_{{ $model }}', __('{{ $packageName }}::menu.{{ $model }}.add'), [
             'route'      => '{{ $packageName }}.{{ $model }}.create',

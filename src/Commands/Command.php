@@ -4,6 +4,7 @@ namespace Sebastienheyd\BoilerplatePackager\Commands;
 
 use Illuminate\Console\Command as BaseCommand;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Sebastienheyd\BoilerplatePackager\Composer;
 use Sebastienheyd\BoilerplatePackager\Package;
 use Sebastienheyd\BoilerplatePackager\Packagist;
@@ -51,6 +52,23 @@ class Command extends BaseCommand
         $this->composer = $composer;
         $this->skeleton = $skeleton;
         $this->storage = Storage::disk('packages');
+    }
+
+    public function getPackage()
+    {
+        $package = Str::lower($this->argument('package'));
+
+        if (! $package) {
+            $choices = [];
+            foreach ($this->storage->directories() as $vendor) {
+                foreach ($this->storage->directories($vendor) as $package) {
+                    $choices[] = $package;
+                }
+            }
+            $package = $this->choice('Which package do you want to remove?', $choices);
+        }
+
+        return $package;
     }
 
     public function getSignature()

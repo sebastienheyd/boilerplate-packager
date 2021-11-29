@@ -28,7 +28,11 @@ class Lang extends Command
             $relations[$resource] = $this->getTableRelations($table, $this->argument('prefix'));
         }
 
+        $locale = app()->getLocale();
+
         foreach ($files as $file) {
+            app()->setLocale($file->getRelativePath());
+
             $dest = str_replace([$path, '.blade'], '', $file);
             $view = str_replace(['.php', '/'], ['', '.'], $dest);
 
@@ -36,6 +40,8 @@ class Lang extends Command
 
             $this->storage->put($package.'/src/resources/lang'.$dest, $content);
         }
+
+        app()->setLocale($locale);
 
         $this->info('Writing locales');
     }
