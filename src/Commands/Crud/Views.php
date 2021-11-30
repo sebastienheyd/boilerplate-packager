@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 
 class Views extends Command
 {
-    protected $signature = 'boilerplate:packager:crud:views {package} {tables} {prefix?}';
+    protected $signature = 'boilerplate:packager:crud:views {package} {tables} {namespaces?} {prefix?}';
     protected $description = '';
 
     public function handle()
@@ -45,6 +45,7 @@ class Views extends Command
         }
 
         $data = [
+            'namespaces' => $this->argument('namespaces'),
             'namespace' => $this->getNamespace($package),
             'resource' => preg_replace('#^'.$this->argument('prefix').'#', '', $table),
             'vendor' => $vendor,

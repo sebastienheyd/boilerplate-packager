@@ -12,7 +12,7 @@ class CreatePackage extends Command
      *
      * @var string
      */
-    protected $signature = 'boilerplate:packager:create {package} {--dev : Put package in require-dev section}';
+    protected $signature = 'boilerplate:packager:create {package?} {--dev : Put package in require-dev section}';
 
     /**
      * The console command description.
@@ -28,7 +28,13 @@ class CreatePackage extends Command
      */
     public function handle()
     {
-        $package = Str::lower($this->argument('package'));
+        $package = $this->argument('package');
+
+        if ($package === null) {
+            $package = $this->ask('Name of the package to create (format must be vendor/package)');
+        }
+
+        $package = Str::lower($package);
         $this->alert("Creating a new package $package");
 
         if (! $this->packagist->checkFormat($package)) {

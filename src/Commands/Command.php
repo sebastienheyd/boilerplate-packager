@@ -33,7 +33,7 @@ class Command extends BaseCommand
     protected $skeleton;
 
     /**
-     * @var \Illuminate\Support\Facades\Storage
+     * @var Storage
      */
     protected $storage;
 
@@ -65,7 +65,7 @@ class Command extends BaseCommand
                     $choices[] = $package;
                 }
             }
-            $package = $this->choice('Which package do you want to remove?', $choices);
+            $package = $this->choice('Select a package', $choices);
         }
 
         return $package;

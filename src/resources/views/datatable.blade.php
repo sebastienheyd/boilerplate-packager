@@ -38,7 +38,7 @@ class {{ Str::plural($className) }}Datatable extends Datatable
             Column::add(__('{{ $packageName }}::resource.{{ Str::lower($className) }}.properties.{{ $column['name'] }}'))
                 ->width('180px')
                 ->data('{{ $column['name'] }}')
-                ->dateFormat(),
+                ->dateFormat({!! $column['type'] === 'date' ? "__('boilerplate::date.Ymd')" : ''  !!}),
 @elseif($column['name'] === 'id')
             Column::add(__('{{ $packageName }}::resource.{{ Str::lower($className) }}.properties.{{ $column['name'] }}'))
                 ->width('60px')

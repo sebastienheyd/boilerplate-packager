@@ -54,7 +54,14 @@ class CrudPackage extends Command
 
         $namespaces = [];
 
+        $inDb = Schema::getConnection()->getDoctrineSchemaManager()->listTableNames();
+
         foreach ($tables as $k => $table) {
+            if (! in_array($table, $inDb)) {
+                $this->error("Table \"$table\" is not in the current database, maybe you have to run \"php artisan migrate\"");
+                return;
+            }
+
             foreach (Schema::getConnection()->getDoctrineSchemaManager()->listTableForeignKeys($table) as $fk) {
                 if (in_array($fk->getForeignTableName(), $tables)) {
                     continue;
@@ -84,14 +91,14 @@ class CrudPackage extends Command
         $this->options = $this->option('only');
         $args['prefix'] = $this->option('prefix');
 
-        $this->callCommand('datatable', array_merge_recursive($args, ['namespaces' => $namespaces]));
-        $this->callCommand('model', array_merge_recursive($args, ['namespaces' => $namespaces]));
-        $this->callCommand('routes', $args);
-        $this->callCommand('lang', $args);
-        $this->callCommand('permissions', $args);
-        $this->callCommand('controller', array_merge_recursive($args, ['namespaces' => $namespaces]));
-        $this->callCommand('menu', $args);
-        $this->callCommand('views', $args);
+//        $this->callCommand('model', array_merge_recursive($args, ['namespaces' => $namespaces]));
+//        $this->callCommand('routes', $args);
+//        $this->callCommand('lang', $args);
+//        $this->callCommand('permissions', $args);
+//        $this->callCommand('controller', array_merge_recursive($args, ['namespaces' => $namespaces]));
+//        $this->callCommand('menu', $args);
+        $this->callCommand('views', array_merge_recursive($args, ['namespaces' => $namespaces]));
+//        $this->callCommand('datatable', array_merge_recursive($args, ['namespaces' => $namespaces]));
     }
 
     private function callCommand($action, $args)
