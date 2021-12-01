@@ -69,6 +69,7 @@ class CrudPackage extends Command
         foreach ($tables as $k => $table) {
             if (! in_array($table, $inDb)) {
                 $this->error("Table \"$table\" is not in the current database, maybe you have to run \"php artisan migrate\"");
+
                 return;
             }
 
@@ -135,7 +136,7 @@ class CrudPackage extends Command
     {
         $ns = Namespaces::get($model);
 
-        if($ns) {
+        if ($ns) {
             return $ns;
         }
 

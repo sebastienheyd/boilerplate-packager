@@ -8,7 +8,6 @@ use Illuminate\Foundation\Application as Laravel;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use function Illuminate\Events\queueable;
 
 class Command extends BaseCommand
 {
@@ -30,11 +29,11 @@ class Command extends BaseCommand
 
         foreach ($relations as $type => $rels) {
             foreach ($rels as $rel) {
-                if(Namespaces::get($rel['method'])) {
+                if (Namespaces::get($rel['method'])) {
                     continue;
                 }
 
-                if (!class_exists("\\".$this->getNamespace($package)."\\Models\\".$rel['model'])) {
+                if (! class_exists('\\'.$this->getNamespace($package).'\\Models\\'.$rel['model'])) {
                     question:
                     $msg = sprintf('Input the namespace for the model <comment>%s</comment>', $rel['model']);
                     $ns = $this->ask($msg, 'App\Models');
