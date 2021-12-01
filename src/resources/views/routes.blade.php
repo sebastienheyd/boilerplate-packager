@@ -1,16 +1,19 @@
 {!! '<?php' !!}
 
+@foreach($models as $model)
+use \{!! $namespace !!}\Controllers\{{ Str::studly(Str::singular($model)) }}Controller;
+@endforeach
+
 $default = [
     'prefix'     => config('boilerplate.app.prefix', '').'/{{ $package }}',
     'domain'     => config('boilerplate.app.domain', ''),
+    'as'         => '{{ $package }}.',
     'middleware' => [
         'web',
         'boilerplatelocale',
         'boilerplateauth',
         'ability:admin,backend_access,{{ $package }}_access'
     ],
-    'as'         => '{{ $package }}.',
-    'namespace'  => '\{!! $namespace !!}\Controllers',
 ];
 
 Route::group($default, function () {
@@ -18,10 +21,9 @@ Route::group($default, function () {
     // {{ Str::studly($model) }} routes
 @foreach($relations[$model] as $type => $resources)
 @foreach($resources as $resource)
-    Route::post('{{ Str::singular($model) }}/{{ $resource['method'] }}', ['as' => '{{ Str::singular($model) }}.{{ $resource['method'] }}', 'uses' => '{{ Str::studly(Str::singular($model)) }}Controller{!! '@'.$resource['method'] !!}']);
+    Route::post('{{ Str::singular($model) }}/{{ $resource['method'] }}', [{{ Str::studly(Str::singular($model)) }}Controller::class, '{{ $resource['method'] }}'])->name('{{ Str::singular($model) }}.{{ $resource['method'] }}');
 @endforeach
 @endforeach
-    Route::post('{{ Str::singular($model) }}/datatable', ['as' => '{{ Str::singular($model) }}.datatable', 'uses' => '{{ Str::studly(Str::singular($model)) }}Controller@datatable']);
-    Route::resource('{{ Str::singular($model) }}', '{{ Str::studly(Str::singular($model)) }}Controller');
+    Route::resource('{{ Str::singular($model) }}', {{ Str::studly(Str::singular($model)) }}Controller::class);
 @endforeach
 });

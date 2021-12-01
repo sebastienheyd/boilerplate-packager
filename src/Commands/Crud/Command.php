@@ -8,6 +8,7 @@ use Illuminate\Foundation\Application as Laravel;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use function Illuminate\Events\queueable;
 
 class Command extends BaseCommand
 {
@@ -21,6 +22,35 @@ class Command extends BaseCommand
 
         $this->isLaravelEqualOrGreaterThan7 = version_compare(Laravel::VERSION, '7.0', '>=');
         $this->storage = Storage::disk('packages');
+    }
+
+    protected function checkRelations($package, $relations)
+    {
+        $res = [];
+
+        foreach ($relations as $type => $rels) {
+            foreach ($rels as $rel) {
+                if(Namespaces::get($rel['method'])) {
+                    continue;
+                }
+
+                if (!class_exists("\\".$this->getNamespace($package)."\\Models\\".$rel['model'])) {
+                    question:
+                    $msg = sprintf('Input the namespace for the model <comment>%s</comment>', $rel['model']);
+                    $ns = $this->ask($msg, 'App\Models');
+
+                    if (! class_exists($ns.'\\'.$rel['model'])) {
+                        $this->line(' <error> Class <fg=yellow;bg=red>'.$ns.'\\'.$rel['model'].'</> does not exists </error>');
+                        goto question;
+                    }
+
+                    Namespaces::register($rel['method'], $ns);
+                    $res[$rel['method']] = $ns;
+                }
+            }
+        }
+
+        return $res;
     }
 
     protected function getNamespace($package)
@@ -69,6 +99,7 @@ class Command extends BaseCommand
                         $return = true;
                     } else {
                         $foreignTable = [
+                            'table' => $table->getName(),
                             'method' => $this->removePrefix($fk->getForeignTableName()),
                             'model' => $this->getClassFromRelationTable($fk->getForeignTableName()),
                             'labelField' => $this->getTableLabelField($fk->getForeignTableName()),
@@ -87,6 +118,7 @@ class Command extends BaseCommand
             foreach ($table->getForeignKeys() as $fk) {
                 if ($fk->getForeignTableName() === $tableName) {
                     $relations['hasMany'][] = [
+                        'table' => $tableName,
                         'method' => $this->removePrefix($fk->getLocalTableName()),
                         'model' => $this->getClassFromRelationTable($fk->getLocalTableName()),
                         'labelField' => $this->getTableLabelField($fk->getLocalTableName()),
@@ -99,6 +131,7 @@ class Command extends BaseCommand
                     $req = Schema::getConnection()->getDoctrineColumn($tableName, $fk->getColumns()[0])->getNotnull();
 
                     $relations['belongsTo'][] = [
+                        'table' => $tableName,
                         'method' => $this->removePrefix($fk->getForeignTableName()),
                         'model' => $this->getClassFromRelationTable($fk->getForeignTableName()),
                         'labelField' => $this->getTableLabelField($fk->getForeignTableName()),

@@ -19,9 +19,12 @@ class Controller extends Command
     private function buildController($table)
     {
         $package = $this->argument('package');
+        $namespaces = $this->argument('namespaces');
         [$vendor, $packageName] = explode('/', $package);
         $columns = $this->getColumnsFromTable($table);
         $relations = $this->getTableRelations($table, $this->argument('prefix'));
+        $ns = $this->checkRelations($package, $relations);
+        $namespaces = array_merge($namespaces, $ns);
 
         $fillable = [];
 
@@ -41,7 +44,7 @@ class Controller extends Command
 
         $data = [
             'namespace' => $this->getNamespace($package),
-            'namespaces' => $this->argument('namespaces'),
+            'namespaces' => $namespaces,
             'resource' => preg_replace('#^'.$this->argument('prefix').'#', '', $table),
             'vendor' => $vendor,
             'packageName' => $packageName,

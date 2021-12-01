@@ -9,19 +9,17 @@ use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
-use Illuminate\View\View;
-use Throwable;
-use Yajra\DataTables\DataTables;
 use {{ $namespace }}\Models\{{ Str::studly(Str::singular($resource)) }};
 @if (count($relations ?? []))
 @foreach($relations as $type => $rels)
+@if($type !== 'hasMany')
 @foreach($rels as $rel)
 @if(isset($namespaces[$rel['method']]))use {{ $namespaces[$rel['method']] }}\{{ $rel['model'] }};
 @else()use {{ $namespace }}\Models\{{ $rel['model'] }};
 @endif
 @endforeach
+@endif
 @endforeach
 @endif
 
@@ -30,7 +28,7 @@ class {{ Str::studly(Str::singular($resource)) }}Controller extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return Application|Factory|Response|View
+     * @return Application|Factory
      */
     public function index()
     {
@@ -38,28 +36,9 @@ class {{ Str::studly(Str::singular($resource)) }}Controller extends Controller
     }
 
     /**
-     * Get datatable of the resource.
-     *
-     * @param DataTables $dataTables
-     *
-     * @link https://yajrabox.com/docs/laravel-datatables
-     *
-     * @throws Throwable
-     * @return mixed
-     */
-    public function datatable(DataTables $dataTables)
-    {
-        return $dataTables->eloquent({{ Str::studly(Str::singular($resource)) }}::query())
-            ->rawColumns(['buttons'])
-            ->editColumn('buttons', function (${{ Str::singular($resource) }}) {
-                return view('{{ $packageName }}::{{ Str::singular($resource) }}.listButtons', ['{{ Str::singular($resource) }}' => ${{ Str::singular($resource) }}])->render();
-            })->make(true);
-    }
-
-    /**
      * Show the form for creating a new resource.
      *
-     * @return Application|Factory|Response|View
+     * @return Application|Factory
      */
     public function create()
     {
@@ -74,7 +53,7 @@ class {{ Str::studly(Str::singular($resource)) }}Controller extends Controller
      * @throws ValidationException
      * @return RedirectResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $this->validate($request, [
 @foreach($fillable as $field)
@@ -96,7 +75,7 @@ class {{ Str::studly(Str::singular($resource)) }}Controller extends Controller
 
 @foreach($relations as $type => $rels)
 @foreach($rels as $relation)
-@if(in_array($type, ['hasMany', 'belongsToMany']))
+@if($type === 'belongsToMany')
         ${{ Str::singular($resource) }}->{{ $relation['method'] }}()->sync($request->post('{{ $relation['method'] }}'));
 
 @endif
@@ -111,7 +90,7 @@ class {{ Str::studly(Str::singular($resource)) }}Controller extends Controller
      * Display the specified resource.
      *
      * @param  {{ Str::studly(Str::singular($resource)) }}  ${{ Str::singular($resource) }}
-     * @return Application|Factory|Response|View
+     * @return Application|Factory
      */
     public function show({{ Str::studly(Str::singular($resource)) }} ${{ Str::singular($resource) }})
     {
@@ -122,7 +101,7 @@ class {{ Str::studly(Str::singular($resource)) }}Controller extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  {{ Str::studly(Str::singular($resource)) }}  ${{ Str::singular($resource) }}
-     * @return Application|Factory|Response|View
+     * @return Application|Factory
      */
     public function edit({{ Str::studly(Str::singular($resource)) }} ${{ Str::singular($resource) }})
     {
@@ -138,7 +117,7 @@ class {{ Str::studly(Str::singular($resource)) }}Controller extends Controller
      * @throws ValidationException
      * @return RedirectResponse
      */
-    public function update(Request $request, {{ Str::studly(Str::singular($resource)) }} ${{ Str::singular($resource) }})
+    public function update(Request $request, {{ Str::studly(Str::singular($resource)) }} ${{ Str::singular($resource) }}): RedirectResponse
     {
         $this->validate($request, [
 @foreach($fillable as $field)
@@ -160,7 +139,7 @@ class {{ Str::studly(Str::singular($resource)) }}Controller extends Controller
 
 @foreach($relations as $type => $rels)
 @foreach($rels as $relation)
-@if(in_array($type, ['hasMany', 'belongsToMany']))
+@if($type === 'belongsToMany')
         ${{ Str::singular($resource) }}->{{ $relation['method'] }}()->sync($request->post('{{ $relation['method'] }}'));
 
 @endif
@@ -179,7 +158,7 @@ class {{ Str::studly(Str::singular($resource)) }}Controller extends Controller
      * @throws Exception
      * @return JsonResponse
      */
-    public function destroy({{ Str::studly(Str::singular($resource)) }} ${{ Str::singular($resource) }})
+    public function destroy({{ Str::studly(Str::singular($resource)) }} ${{ Str::singular($resource) }}): JsonResponse
     {
         return response()->json(['success' => ${{ Str::singular($resource) }}->delete() ?? false]);
     }
@@ -192,8 +171,8 @@ class {{ Str::studly(Str::singular($resource)) }}Controller extends Controller
     public function {{ $relation['method'] }}(Request $request)
     {
         return response()->json([
-            'results' => {{ $relation['model'] }}::selectRaw('{{ $relation['idField'] }} as id, {{ $relation['labelField'] }} as text')
-                ->where('{{ $relation['labelField'] }}', 'like', $request->input('q').'%')
+            'results' => {{ $relation['model'] }}::selectRaw('{{ $relation['idField'] }} as id, {{ $relation['labelField'] ?: 'id' }} as text')
+                ->where('{{ $relation['labelField'] ?: 'id' }}', 'like', $request->input('q').'%')
                 ->get()->toArray()
         ]);
     }

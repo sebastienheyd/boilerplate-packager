@@ -24,7 +24,7 @@ class Model extends Command
 
         $model = (string) view('packager::model', [
             'namespace'     => $this->getNamespace($package).'\Models',
-            'namespaces'    => $this->argument('namespaces'),
+            'namespaces'    => Namespaces::get(),
             'className'     => $className,
             'table'         => $table,
             'fillable'      => $columns->filter(function ($column) {

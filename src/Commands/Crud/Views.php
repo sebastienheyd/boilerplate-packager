@@ -45,7 +45,7 @@ class Views extends Command
         }
 
         $data = [
-            'namespaces' => $this->argument('namespaces'),
+            'namespaces' => Namespaces::get(),
             'namespace' => $this->getNamespace($package),
             'resource' => preg_replace('#^'.$this->argument('prefix').'#', '', $table),
             'vendor' => $vendor,

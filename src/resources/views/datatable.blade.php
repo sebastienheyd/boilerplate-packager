@@ -6,15 +6,6 @@ use Sebastienheyd\Boilerplate\Datatables\Button;
 use Sebastienheyd\Boilerplate\Datatables\Column;
 use Sebastienheyd\Boilerplate\Datatables\Datatable;
 use {{ $namespace }}\Models\{{ $className }};
-@if (count($relations ?? []))
-@foreach($relations as $type => $rels)
-@foreach($rels as $rel)
-@if(isset($namespaces[$rel['method']]))use {{ $namespaces[$rel['method']] }}\{{ $rel['model'] }};
-@else()use {{ $namespace }}\Models\{{ $rel['model'] }};
-@endif
-@endforeach
-@endforeach
-@endif
 
 class {{ Str::plural($className) }}Datatable extends Datatable
 {

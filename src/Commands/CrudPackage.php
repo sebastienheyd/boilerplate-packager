@@ -4,6 +4,7 @@ namespace Sebastienheyd\BoilerplatePackager\Commands;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Sebastienheyd\BoilerplatePackager\Commands\Crud\Namespaces;
 
 class CrudPackage extends Command
 {
@@ -52,6 +53,15 @@ class CrudPackage extends Command
             return 1;
         }
 
+        $warn = '  Warning ! This command will overwrite all files in the package '.$package.'  ';
+        $this->warn(str_repeat('*', strlen($warn)));
+        $this->warn($warn);
+        $this->warn(str_repeat('*', strlen($warn)));
+
+        if (! $this->confirm('Confirm?')) {
+            return 0;
+        }
+
         $namespaces = [];
 
         $inDb = Schema::getConnection()->getDoctrineSchemaManager()->listTableNames();
@@ -67,8 +77,8 @@ class CrudPackage extends Command
                     continue;
                 }
 
-                $model = Str::studly(Str::singular($fk->getForeignTableName()));
-                $namespaces[$fk->getForeignTableName()] = $this->checkModel($model);
+                $ns = $this->checkModel($fk->getForeignTableName());
+                Namespaces::register($fk->getForeignTableName(), $ns);
             }
 
             // Remove pivot tables
@@ -77,28 +87,21 @@ class CrudPackage extends Command
             }
         }
 
-        $warn = '  Warning ! This command will overwrite all files in the package '.$package.'  ';
-        $this->warn(str_repeat('*', strlen($warn)));
-        $this->warn($warn);
-        $this->warn(str_repeat('*', strlen($warn)));
-
-        if (! $this->confirm('Confirm?')) {
-            return 0;
-        }
-
         $args = ['tables' => $tables, 'package' => $package];
 
         $this->options = $this->option('only');
         $args['prefix'] = $this->option('prefix');
 
-//        $this->callCommand('model', array_merge_recursive($args, ['namespaces' => $namespaces]));
-//        $this->callCommand('routes', $args);
-//        $this->callCommand('lang', $args);
-//        $this->callCommand('permissions', $args);
-//        $this->callCommand('controller', array_merge_recursive($args, ['namespaces' => $namespaces]));
-//        $this->callCommand('menu', $args);
+        $namespaces = Namespaces::get();
+
+        $this->callCommand('controller', array_merge_recursive($args, ['namespaces' => $namespaces]));
+        $this->callCommand('datatable', array_merge_recursive($args, ['namespaces' => $namespaces]));
+        $this->callCommand('lang', $args);
+        $this->callCommand('menu', $args);
+        $this->callCommand('model', array_merge_recursive($args, ['namespaces' => $namespaces]));
+        $this->callCommand('permissions', $args);
+        $this->callCommand('routes', $args);
         $this->callCommand('views', array_merge_recursive($args, ['namespaces' => $namespaces]));
-//        $this->callCommand('datatable', array_merge_recursive($args, ['namespaces' => $namespaces]));
     }
 
     private function callCommand($action, $args)
@@ -130,6 +133,14 @@ class CrudPackage extends Command
 
     private function checkModel($model)
     {
+        $ns = Namespaces::get($model);
+
+        if($ns) {
+            return $ns;
+        }
+
+        $model = Str::studly(Str::singular($model));
+
         $msg = sprintf('Input the namespace for the model <comment>%s</comment>', $model);
         $ns = $this->ask($msg, 'App\Models');
 

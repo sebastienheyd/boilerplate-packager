@@ -57,7 +57,7 @@ class {{ $className }} extends Model
      */
     public function {{ $relation['method'] }}(): BelongsToMany
     {
-        return $this->belongsToMany({{ $relation['model'] }}::class);
+        return $this->belongsToMany({{ $relation['model'] }}::class, "{{ $relation['table'] }}");
     }
 @endforeach
 @endif
