@@ -18,10 +18,11 @@ class {{ Str::plural($className) }}Datatable extends Datatable
 
     public function setUp()
     {
-        $this->locale([
-            'deleteConfirm' => __('{{ $packageName }}::resource.{{ Str::singular($resource) }}.delete_confirm'),
-            'deleteSuccess' => __('{{ $packageName }}::resource.{{ Str::singular($resource) }}.delete_success'),
-        ])->order('{{ $columns[0]['name'] }}', 'desc');
+        $this->permissions('{{ Str::singular($resource) }}_access')
+            ->locale([
+                'deleteConfirm' => __('{{ $packageName }}::resource.{{ Str::singular($resource) }}.delete_confirm'),
+                'deleteSuccess' => __('{{ $packageName }}::resource.{{ Str::singular($resource) }}.delete_success'),
+            ])->order('{{ $columns[0]['name'] }}', 'desc');
     }
 
     public function columns(): array
