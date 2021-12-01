@@ -18,7 +18,10 @@ class {{ Str::plural($className) }}Datatable extends Datatable
 
     public function setUp()
     {
-        $this->order('{{ $columns[0]['name'] }}', 'desc');
+        $this->locale([
+            'deleteConfirm' => __('{{ $packageName }}::resource.{{ Str::singular($resource) }}.delete_confirm'),
+            'deleteSuccess' => __('{{ $packageName }}::resource.{{ Str::singular($resource) }}.delete_success'),
+        ])->order('{{ $columns[0]['name'] }}', 'desc');
     }
 
     public function columns(): array
@@ -48,27 +51,10 @@ class {{ Str::plural($className) }}Datatable extends Datatable
             Column::add()
                 ->width('20px')
                 ->actions(function ({{ $className }} ${{ Str::lower($className) }}) {
-                    return implode([
-                        Button::add()
-                            ->route('{{ $packageName }}.{{ Str::lower($className) }}.show', ${{ Str::lower($className) }})
-                            ->class('show-{{ Str::lower($className) }}')
-                            ->color('default')
-                            ->icon('eye')
-                            ->make(),
-
-                        Button::add()
-                            ->route('{{ $packageName }}.{{ Str::lower($className) }}.edit', ${{ Str::lower($className) }})
-                            ->class('edit-{{ Str::lower($className) }}')
-                            ->color('primary')
-                            ->icon('pencil-alt')
-                            ->make(),
-
-                        Button::add()
-                            ->route('{{ $packageName }}.{{ Str::lower($className) }}.destroy', ${{ Str::lower($className) }})
-                            ->class('delete-{{ Str::lower($className) }}')
-                            ->color('danger')
-                            ->icon('trash')
-                            ->make(),
+                    return join([
+                        Button::show('{{ $packageName }}.{{ Str::lower($className) }}.show', ${{ Str::lower($className) }}),
+                        Button::edit('{{ $packageName }}.{{ Str::lower($className) }}.edit', ${{ Str::lower($className) }}),
+                        Button::delete('{{ $packageName }}.{{ Str::lower($className) }}.destroy', ${{ Str::lower($className) }}),
                     ]);
                 }),
         ];

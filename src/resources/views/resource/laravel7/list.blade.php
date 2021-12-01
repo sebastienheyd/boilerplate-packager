@@ -24,7 +24,7 @@
 @@push('js')
 &lt;x-boilerplate::minify>
     <script>
-        $(document).on('click', 'a.show-{{ Str::singular($resource) }}', function(e) {
+        $(document).on('click', '[data-action="dt-show-element"]', function(e) {
             e.preventDefault();
             $.ajax({
                 url: $(this).attr('href'),
@@ -36,27 +36,6 @@
                         message: res
                     })
                 }
-            })
-        })
-
-        $(document).on('click', 'a.delete-{{ Str::singular($resource) }}', function(e) {
-            e.preventDefault();
-            let url = $(this).attr('href');
-            bootbox.confirm("@@lang('{{ $packageName }}::resource.{{ Str::singular($resource) }}.delete_confirm')", function(r) {
-                if (r === false) {
-                    return
-                }
-
-                $.ajax({
-                    url: url,
-                    type: 'delete',
-                    success: function(res) {
-                        if (res.success) {
-                            dt{{ Str::studly($resource) }}.ajax.reload();
-                            growl("@@lang('{{ $packageName }}::resource.{{ Str::singular($resource) }}.delete_success')", "success")
-                        }
-                    }
-                })
             })
         })
     </script>
