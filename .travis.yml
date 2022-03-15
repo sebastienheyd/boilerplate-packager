@@ -2,17 +2,17 @@ language: php
 
 php:
   - 7.3
-  - 7.4
   - 8.0
 
 cache:
   directories:
     - $HOME/.composer/cache
+    - $HOME/.cache/composer
 
 before_script:
-  - phpenv config-add travis.php.ini
-  - travis_retry composer self-update
-  - travis_retry composer install --prefer-source --no-interaction
+  - phpenv config-rm xdebug.ini
+  - composer self-update
+  - COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction --no-progress
 
 script:
   - vendor/bin/phpcs
