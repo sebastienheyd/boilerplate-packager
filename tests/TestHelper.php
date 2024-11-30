@@ -2,8 +2,8 @@
 
 namespace Sebastienheyd\BoilerplatePackager\Tests;
 
-use Illuminate\Foundation\Application as Laravel;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Application as Laravel;
 
 trait TestHelper
 {

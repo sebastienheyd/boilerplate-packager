@@ -47,7 +47,7 @@ class ListPackage extends Command
                     'require-dev' => '-',
                 ];
 
-                if (is_dir(packages_path($package) . DIRECTORY_SEPARATOR . '.git')) {
+                if (is_dir(packages_path($package).DIRECTORY_SEPARATOR.'.git')) {
                     (new Process(['git', 'branch'], packages_path($package)))->run(function (
                         $type,
                         $buffer

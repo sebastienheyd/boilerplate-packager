@@ -71,10 +71,10 @@ class Command extends BaseCommand
             $required = boolval(Schema::getConnection()->getDoctrineColumn($table, $column)->getNotnull());
 
             return [
-                'name'        => $column,
-                'type'        => Schema::getColumnType($table, $column),
-                'required'    => $required,
-                'unique'      => $uniqueIndex->count() > 0,
+                'name' => $column,
+                'type' => Schema::getColumnType($table, $column),
+                'required' => $required,
+                'unique' => $uniqueIndex->count() > 0,
             ];
         });
     }

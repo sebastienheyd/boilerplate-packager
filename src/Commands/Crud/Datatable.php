@@ -24,13 +24,13 @@ class Datatable extends Command
         $columns = $this->getColumnsFromTable($table);
 
         $datatable = (string) view('packager::datatable', [
-            'namespace'     => $this->getNamespace($package),
-            'resource'      => preg_replace('#^'.$this->argument('prefix').'#', '', $table),
-            'className'     => $className,
-            'vendor'        => $vendor,
-            'packageName'   => $packageName,
-            'table'         => $table,
-            'columns'       => $columns,
+            'namespace' => $this->getNamespace($package),
+            'resource' => preg_replace('#^'.$this->argument('prefix').'#', '', $table),
+            'className' => $className,
+            'vendor' => $vendor,
+            'packageName' => $packageName,
+            'table' => $table,
+            'columns' => $columns,
             'relations' => $this->getTableRelations($table, $this->argument('prefix')),
         ]);
 
