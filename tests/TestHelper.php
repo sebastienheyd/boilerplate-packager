@@ -2,86 +2,68 @@
 
 namespace Sebastienheyd\BoilerplatePackager\Tests;
 
+use Illuminate\Foundation\Application as Laravel;
 use Illuminate\Filesystem\Filesystem;
-use Symfony\Component\Process\Process;
 
 trait TestHelper
 {
-    /**
-     * Create a modified copy of testbench to be used as a template.
-     * Before each test, a fresh copy of the template is created.
-     */
-    private static function setUpLocalTestbench()
+    public const TESTBENCH_PATH = __DIR__.'/../vendor/orchestra/testbench-core/laravel';
+
+    public static bool $once = false;
+
+    public static function setUpBeforeClass(): void
     {
-        if (! file_exists(self::TEST_APP_TEMPLATE)) {
-            fwrite(STDOUT, 'Setting up test environment for first use.'.PHP_EOL);
-            $files = new Filesystem();
-            $files->makeDirectory(self::TEST_APP_TEMPLATE, 0755, true);
-            $original = __DIR__.'/../vendor/orchestra/testbench-core/laravel/';
-            $files->copyDirectory($original, self::TEST_APP_TEMPLATE);
-
-            // Modify the composer.json file
-            $composer = json_decode($files->get(self::TEST_APP_TEMPLATE.'/composer.json'), true);
-
-            // Remove "tests/TestCase.php" from autoload (it doesn't exist)
-            unset($composer['autoload']['classmap'][1]);
-
-            // Pre-install illuminate/support
-            $composer['require'] = ['illuminate/support' => '^7.0|^8.0'];
-            $composer['require-dev'] = new \stdClass();
-
-            // Install stable version
-            $composer['minimum-stability'] = 'dev';
-            $composer['prefer-stable'] = true;
-            $files->put(self::TEST_APP_TEMPLATE.'/composer.json', json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-
-            // Install dependencies
-            fwrite(STDOUT, "Installing test environment dependencies\n");
-            (new Process(['composer', 'install', '--no-dev'], self::TEST_APP_TEMPLATE))->run(function ($type, $buffer) {
-                fwrite(STDOUT, $buffer);
-            });
-
-            (new Process(['git', 'init'], self::TEST_APP_TEMPLATE))->run(function ($type, $buffer) {
-                fwrite(STDOUT, $buffer);
-            });
-        }
-
-        (new Filesystem())->copyDirectory(self::TEST_APP_TEMPLATE, self::TEST_APP);
+        parent::setUpBeforeClass();
+        self::initTestBench();
+        self::refreshTestBench();
     }
 
-    private static function removeTestbench()
+    public static function initTestBench(): void
+    {
+        if (self::$once) {
+            return;
+        }
+
+        $php = PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.'.'.PHP_RELEASE_VERSION;
+        echo 'Tested version : Laravel '.Laravel::VERSION.' (PHP '.$php.')'.PHP_EOL;
+        echo 'SQLite version : '.\SQLite3::version()['versionString'].PHP_EOL.PHP_EOL;
+
+        $files = new Filesystem();
+        $packageComposer = json_decode($files->get(__DIR__.'/../composer.json'), true);
+        $testbenchComposer = json_decode($files->get(self::TESTBENCH_PATH.'/composer.json'), true);
+        $testbenchComposer['require'] = $packageComposer['require'];
+        $testbenchComposer['prefer-stable'] = true;
+        $files->put(self::TESTBENCH_PATH.'/composer.json', json_encode($testbenchComposer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+        self::$once = true;
+    }
+
+    protected static function refreshTestBench(): void
+    {
+        self::deleteTestBench();
+        self::backupTestBench();
+    }
+
+    protected static function backupTestBench(): void
     {
         $files = new Filesystem();
-        if ($files->exists(self::TEST_APP)) {
-            $files->deleteDirectory(self::TEST_APP);
+        if ($files->exists(self::TESTBENCH_PATH.'.backup')) {
+            return;
         }
-        if ($files->exists(self::TEST_APP_TEMPLATE)) {
-            $files->deleteDirectory(self::TEST_APP_TEMPLATE);
-        }
+
+        $files->makeDirectory(self::TESTBENCH_PATH.'.backup', 0755, true);
+        $files->copyDirectory(self::TESTBENCH_PATH, self::TESTBENCH_PATH.'.backup');
     }
 
-    /**
-     * @return bool
-     */
-    protected function runProcess(array $command)
-    {
-        $process = new Process($command, self::TEST_APP);
-        $process->run();
-
-        return $process->getExitCode() === 0;
-    }
-
-    protected function installTestApp()
-    {
-        $this->uninstallTestApp();
-        (new Filesystem())->copyDirectory(self::TEST_APP_TEMPLATE, self::TEST_APP);
-    }
-
-    protected function uninstallTestApp()
+    protected static function deleteTestBench(): void
     {
         $files = new Filesystem();
-        if ($files->exists(self::TEST_APP)) {
-            $files->deleteDirectory(self::TEST_APP);
+        if (! $files->exists(self::TESTBENCH_PATH.'.backup')) {
+            return;
         }
+
+        $files->deleteDirectory(self::TESTBENCH_PATH);
+        $files->copyDirectory(self::TESTBENCH_PATH.'.backup', self::TESTBENCH_PATH);
+        $files->deleteDirectory(self::TESTBENCH_PATH.'.backup');
     }
 }

@@ -1,4 +1,4 @@
-.PHONY:help test cs csfix clean
+.PHONY:help cs csfix test testcoverage testcoveragehtml clean
 .DEFAULT_GOAL=help
 
 help:
@@ -8,17 +8,23 @@ composer.phar:
 	@curl -sS https://getcomposer.org/installer | php -- --filename=composer.phar
 	@chmod +x composer.phar
 
-vendor: composer.json
-	@./composer.phar install --prefer-source --no-interaction --optimize-autoloader
+vendor: composer.phar composer.json
+	@./composer.phar install --prefer-dist --no-interaction --optimize-autoloader
 
-cs: composer.phar vendor ## Check for coding standards
+cs: vendor ## Check for coding standards
 	@php vendor/bin/phpcs
 
-csfix: composer.phar vendor ## Check and fix for coding standards
+csfix: vendor ## Check and fix for coding standards
 	@php vendor/bin/phpcbf
 
-test: composer.phar vendor phpunit.xml ## Launch test
-	@php vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+test: vendor phpunit.xml ## Unit testing
+	@php vendor/bin/phpunit --stop-on-failure
+
+testcoverage: composer.phar vendor phpunit.xml ## Unit testing with code coverage
+	@XDEBUG_MODE=coverage php vendor/bin/phpunit --coverage-text
+
+testcoveragehtml: composer.phar vendor phpunit.xml ## Unit testing with code coverage in HTML
+	@XDEBUG_MODE=coverage php vendor/bin/phpunit --coverage-html coverage
 
 clean: ## Remove files needed for tests
-	@rm -rf report testbench vendor .phpunit.result.cache composer.lock composer.phar
+	@rm -rf composer.phar composer.lock vendor testbench coverage .phpunit.result.cache .phpunit.cache

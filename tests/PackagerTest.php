@@ -4,6 +4,8 @@ namespace Sebastienheyd\BoilerplatePackager\Tests;
 
 class PackagerTest extends TestCase
 {
+    const TEST_PACKAGE = 'sebastienheyd/boilerplate-packager';
+
     public function testNoAction()
     {
         $this->artisan('boilerplate:packager')
@@ -27,22 +29,22 @@ class PackagerTest extends TestCase
 
     public function testCreateExistingPackageAbort()
     {
-        $this->artisan('boilerplate:packager', ['action' => 'create', 'package' => 'sebastienheyd/boilerplate'])
+        $this->artisan('boilerplate:packager', ['action' => 'create', 'package' => self::TEST_PACKAGE])
             ->expectsConfirmation('Package already exists on packagist, do you want to install it?', 'no')
             ->assertExitCode(0);
     }
 
     public function testCreateExistingPackage()
     {
-        $this->artisan('boilerplate:packager', ['action' => 'create', 'package' => 'sebastienheyd/boilerplate'])
+        $this->artisan('boilerplate:packager', ['action' => 'create', 'package' => self::TEST_PACKAGE])
             ->expectsConfirmation('Package already exists on packagist, do you want to install it?', 'yes')
             ->expectsOutput('Package installed successfully!')
             ->assertExitCode(0);
 
         $composer = $this->getComposer();
-        $this->assertTrue(is_link(self::TEST_APP.'/vendor/sebastienheyd/boilerplate'));
-        $this->assertTrue(is_dir(self::TEST_APP.'/packages/sebastienheyd/boilerplate'));
-        $this->assertTrue($composer['require']['sebastienheyd/boilerplate'] === '@dev');
+        $this->assertTrue(is_link(self::TESTBENCH_PATH.'/vendor/'.self::TEST_PACKAGE));
+        $this->assertTrue(is_dir(self::TESTBENCH_PATH.'/packages/'.self::TEST_PACKAGE));
+        $this->assertTrue($composer['require'][self::TEST_PACKAGE] === '@dev');
     }
 
     public function testCreatePackage()
@@ -58,8 +60,8 @@ class PackagerTest extends TestCase
             ->assertExitCode(0);
 
         $composer = $this->getComposer();
-        $this->assertTrue(is_link(self::TEST_APP.'/vendor/my-vendor/my-package'));
-        $this->assertTrue(is_dir(self::TEST_APP.'/packages/my-vendor/my-package'));
+        $this->assertTrue(is_link(self::TESTBENCH_PATH.'/vendor/my-vendor/my-package'));
+        $this->assertTrue(is_dir(self::TESTBENCH_PATH.'/packages/my-vendor/my-package'));
         $this->assertTrue($composer['require']['my-vendor/my-package'] === '@dev');
     }
 
@@ -88,8 +90,8 @@ class PackagerTest extends TestCase
             ->assertExitCode(0);
 
         $composer = $this->getComposer();
-        $this->assertTrue(is_link(self::TEST_APP.'/vendor/my-vendor/my-package'));
-        $this->assertTrue(is_dir(self::TEST_APP.'/packages/my-vendor/my-package'));
+        $this->assertTrue(is_link(self::TESTBENCH_PATH.'/vendor/my-vendor/my-package'));
+        $this->assertTrue(is_dir(self::TESTBENCH_PATH.'/packages/my-vendor/my-package'));
         $this->assertTrue($composer['require']['my-vendor/my-package'] === '@dev');
     }
 
@@ -109,7 +111,7 @@ class PackagerTest extends TestCase
 
     public function testRequirePackageAlreadyExistsInProject()
     {
-        $this->artisan('boilerplate:packager', ['action' => 'require', 'package' => 'sebastienheyd/boilerplate'])
+        $this->artisan('boilerplate:packager', ['action' => 'require', 'package' => self::TEST_PACKAGE])
             ->expectsOutput('Package is already installed in the project!')
             ->assertExitCode(1);
     }
@@ -128,31 +130,31 @@ class PackagerTest extends TestCase
             ->assertExitCode(1);
 
         $composer = $this->getComposer();
-        $this->assertTrue(! is_link(self::TEST_APP.'/vendor/sebastienheyd/docker-self-signed-proxy-companion'));
-        $this->assertTrue(! is_dir(self::TEST_APP.'/packages/sebastienheyd/docker-self-signed-proxy-companion'));
+        $this->assertTrue(! is_link(self::TESTBENCH_PATH.'/vendor/sebastienheyd/docker-self-signed-proxy-companion'));
+        $this->assertTrue(! is_dir(self::TESTBENCH_PATH.'/packages/sebastienheyd/docker-self-signed-proxy-companion'));
         $this->assertTrue(! isset($composer['require']['sebastienheyd/docker-self-signed-proxy-companion']));
     }
 
     public function testRequirePackageAlreadyExistsLocally()
     {
-        unlink(self::TEST_APP.'/vendor/sebastienheyd/boilerplate');
+        unlink(self::TESTBENCH_PATH.'/vendor/'.self::TEST_PACKAGE);
 
-        $this->artisan('boilerplate:packager', ['action' => 'require', 'package' => 'sebastienheyd/boilerplate'])
+        $this->artisan('boilerplate:packager', ['action' => 'require', 'package' => self::TEST_PACKAGE])
             ->expectsConfirmation('<fg=yellow>The package already exists in local folder, require current local package?</>', 'yes')
             ->expectsOutput('Package installed successfully!')
             ->assertExitCode(0);
 
         $composer = $this->getComposer();
-        $this->assertTrue(is_link(self::TEST_APP.'/vendor/sebastienheyd/boilerplate'));
-        $this->assertTrue(is_dir(self::TEST_APP.'/packages/sebastienheyd/boilerplate'));
-        $this->assertTrue($composer['require']['sebastienheyd/boilerplate'] === '@dev');
+        $this->assertTrue(is_link(self::TESTBENCH_PATH.'/vendor/'.self::TEST_PACKAGE));
+        $this->assertTrue(is_dir(self::TESTBENCH_PATH.'/packages/'.self::TEST_PACKAGE));
+        $this->assertTrue($composer['require'][self::TEST_PACKAGE] === '@dev');
     }
 
     public function testRequirePackageAlreadyExistsLocallyAndNoReplace()
     {
-        unlink(self::TEST_APP.'/vendor/sebastienheyd/boilerplate');
+        unlink(self::TESTBENCH_PATH.'/vendor/'.self::TEST_PACKAGE);
 
-        $this->artisan('boilerplate:packager', ['action' => 'require', 'package' => 'sebastienheyd/boilerplate'])
+        $this->artisan('boilerplate:packager', ['action' => 'require', 'package' => self::TEST_PACKAGE])
             ->expectsConfirmation('<fg=yellow>The package already exists in local folder, require current local package?</>', 'no')
             ->expectsConfirmation('<fg=yellow>Clear local package and install the downloaded one?</>', 'no')
             ->assertExitCode(0);
@@ -160,16 +162,16 @@ class PackagerTest extends TestCase
 
     public function testRequirePackageAlreadyExistsLocallyAndReplace()
     {
-        $this->artisan('boilerplate:packager', ['action' => 'require', 'package' => 'sebastienheyd/boilerplate'])
+        $this->artisan('boilerplate:packager', ['action' => 'require', 'package' => self::TEST_PACKAGE])
             ->expectsConfirmation('<fg=yellow>The package already exists in local folder, require current local package?</>', 'no')
             ->expectsConfirmation('<fg=yellow>Clear local package and install the downloaded one?</>', 'yes')
             ->expectsOutput('Package installed successfully!')
             ->assertExitCode(0);
 
         $composer = $this->getComposer();
-        $this->assertTrue(is_link(self::TEST_APP.'/vendor/sebastienheyd/boilerplate'));
-        $this->assertTrue(is_dir(self::TEST_APP.'/packages/sebastienheyd/boilerplate'));
-        $this->assertTrue($composer['require']['sebastienheyd/boilerplate'] === '@dev');
+        $this->assertTrue(is_link(self::TESTBENCH_PATH.'/vendor/'.self::TEST_PACKAGE));
+        $this->assertTrue(is_dir(self::TESTBENCH_PATH.'/packages/'.self::TEST_PACKAGE));
+        $this->assertTrue($composer['require'][self::TEST_PACKAGE] === '@dev');
     }
 
     public function testPackagerList()
@@ -179,7 +181,7 @@ class PackagerTest extends TestCase
                 ['Vendor', 'Name', 'Used', 'Remote URL', 'Branch', 'Require-dev'],
                 [
                     ['my-vendor', 'my-package', 'yes', '-', '-', '-'],
-                    ['sebastienheyd', 'boilerplate', 'yes', 'https://github.com/sebastienheyd/boilerplate', 'master', '-'],
+                    ['sebastienheyd', 'boilerplate-packager', 'yes', 'https://github.com/'.self::TEST_PACKAGE, 'master', '-'],
                 ]
             )
             ->assertExitCode(0);
@@ -209,16 +211,16 @@ class PackagerTest extends TestCase
     public function testPackagerRemoveNoPackage()
     {
         $this->artisan('boilerplate:packager', ['action' => 'remove'])
-            ->expectsQuestion('Which package do you want to remove?', 'sebastienheyd/boilerplate')
-            ->expectsConfirmation('<bg=red>You are about to remove the package sebastienheyd/boilerplate, are you sure?</>', 'yes')
-            ->expectsConfirmation('<fg=yellow>Removing folder packages/sebastienheyd/boilerplate?</>', 'yes')
+            ->expectsQuestion('Which package do you want to remove?', self::TEST_PACKAGE)
+            ->expectsConfirmation('<bg=red>You are about to remove the package sebastienheyd/boilerplate-packager, are you sure?</>', 'yes')
+            ->expectsConfirmation('<fg=yellow>Removing folder packages/sebastienheyd/boilerplate-packager?</>', 'yes')
             ->expectsOutput('Package removed successfully!')
             ->assertExitCode(0);
 
         $composer = $this->getComposer();
-        $this->assertTrue(! is_link(self::TEST_APP.'/vendor/sebastienheyd/boilerplate'));
-        $this->assertTrue(! is_dir(self::TEST_APP.'/packages/sebastienheyd/boilerplate'));
-        $this->assertTrue(! isset($composer['require']['sebastienheyd/boilerplate']));
+        $this->assertTrue(! is_link(self::TESTBENCH_PATH.'/vendor/'.self::TEST_PACKAGE));
+        $this->assertTrue(! is_dir(self::TESTBENCH_PATH.'/packages/'.self::TEST_PACKAGE));
+        $this->assertTrue(! isset($composer['require'][self::TEST_PACKAGE]));
     }
 
     public function testPackagerRemovePackage()
@@ -230,14 +232,14 @@ class PackagerTest extends TestCase
             ->assertExitCode(0);
 
         $composer = $this->getComposer();
-        $this->assertTrue(! is_link(self::TEST_APP.'/vendor/my-vendor/my-package'));
-        $this->assertTrue(! is_dir(self::TEST_APP.'/packages/my-vendor/my-package'));
+        $this->assertTrue(! is_link(self::TESTBENCH_PATH.'/vendor/my-vendor/my-package'));
+        $this->assertTrue(! is_dir(self::TESTBENCH_PATH.'/packages/my-vendor/my-package'));
         $this->assertTrue(! isset($composer['require']['my-vendor/my-package']));
     }
 
     private function getComposer()
     {
-        $content = file_get_contents(self::TEST_APP.'/composer.json');
+        $content = file_get_contents(self::TESTBENCH_PATH.'/composer.json');
 
         return json_decode($content, true);
     }

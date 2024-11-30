@@ -1,5 +1,7 @@
 .idea/
 .phpunit.result.cache
+.phpunit.cache
+coverage/
 testbench/
 src/node_modules
 src/package-lock.json

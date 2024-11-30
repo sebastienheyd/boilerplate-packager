@@ -47,31 +47,33 @@ class ListPackage extends Command
                     'require-dev' => '-',
                 ];
 
-                (new Process(['git', 'branch'], packages_path($package)))->run(function (
-                    $type,
-                    $buffer
-                ) use (
-                    &$list,
-                    $package
-                ) {
-                    if (preg_match('`^\*\s(.*)$`m', $buffer, $m)) {
-                        $list[$package]['branch'] = $m[1];
-                    }
-                });
+                if (is_dir(packages_path($package) . DIRECTORY_SEPARATOR . '.git')) {
+                    (new Process(['git', 'branch'], packages_path($package)))->run(function (
+                        $type,
+                        $buffer
+                    ) use (
+                        &$list,
+                        $package
+                    ) {
+                        if (preg_match('`^\*\s(.*)$`m', $buffer, $m)) {
+                            $list[$package]['branch'] = $m[1];
+                        }
+                    });
 
-                (new Process(['git', 'config', '--get', 'remote.origin.url'], packages_path($package)))->run(function (
-                    $type,
-                    $buffer
-                ) use (
-                    &$list,
-                    $package
-                ) {
-                    $list[$package]['remote_url'] = trim($buffer);
-                });
+                    (new Process(['git', 'config', '--get', 'remote.origin.url'], packages_path($package)))->run(function (
+                        $type,
+                        $buffer
+                    ) use (
+                        &$list,
+                        $package
+                    ) {
+                        $list[$package]['remote_url'] = trim($buffer);
+                    });
+                }
 
                 if (is_link(base_path('vendor'.DIRECTORY_SEPARATOR.$package))) {
                     $linkRel = implode(DIRECTORY_SEPARATOR, ['..', '..', 'packages', $vendor, $name]);
-                    if (readlink(base_path('vendor'.DIRECTORY_SEPARATOR.$package)) === $linkRel) {
+                    if (trim(readlink(base_path('vendor'.DIRECTORY_SEPARATOR.$package)), DIRECTORY_SEPARATOR) === $linkRel) {
                         $list[$package]['installed'] = 'yes';
                     }
                 }
